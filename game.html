@@ -13,7 +13,8 @@
   html, body { width: 100%; height: 100%; overflow: hidden; background: #000; color: #fff;
     font-family: "Courier New", Courier, monospace; touch-action: none; cursor: none; }
   #stage { position: relative; width: 100vw; height: 100vh; background: #000;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    overflow: hidden; gap: 12px; }
   canvas#anim { position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     pointer-events: none; z-index: 50; display: none; }
   canvas#backdrop { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -28,8 +29,8 @@
   #scroll { display: inline-block; white-space: nowrap; color: var(--ink);
     font-size: clamp(10px,1.8vw,14px); font-weight: bold; letter-spacing: 3px;
     text-transform: uppercase; will-change: transform; }
-  #ui { position: absolute; top: 2%; left: 50%; transform: translateX(-50%);
-    z-index: 30; text-align: center; pointer-events: none; opacity: 0; transition: opacity 0.5s; }
+  #ui { z-index: 30; text-align: center; pointer-events: none; opacity: 0;
+    transition: opacity 0.5s; margin-top: 8px; }
   #ui.visible { opacity: 1; }
   .ui-strike { font-size: 18px; font-weight: bold; color: var(--red); text-shadow: 1px 1px 0 #000; margin-bottom: 3px; }
   .ui-hint { font-size: 15px; color: var(--cyn); text-shadow: 1px 1px 0 #000; }
@@ -56,10 +57,15 @@
   }
   .pulse { animation: pulse 1.5s infinite; }
   @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(1.05); } }
-  #portrait-wrap { width: 100%; text-align: center; padding: 8px 0 3px 0; box-sizing: border-box; }
-  #portrait { width: 300px; height: 180px; border: 4px double #fff;
-    box-shadow: 0 0 50px rgba(255,0,255,0.3); display: none; opacity: 0; transition: opacity 0.6s;
-    margin: 0 auto; object-fit: cover; background: #000; }
+  #portrait-wrap { width: 100%; text-align: center; padding: 10px 0 8px 0; box-sizing: border-box; z-index: 15; pointer-events: none; }
+  #portrait-frame { display: inline-block; border: 10px solid #4a3a2a;
+    border-image: linear-gradient(45deg, #8a8a8a, #4a3a2a, #2a1a12, #4a3a2a, #8a8a8a) 1;
+    box-shadow: 0 0 100px rgba(255,0,255,0.6), 0 0 20px rgba(0,255,255,0.4);
+    background: #0a0a0a; padding: 6px; display: none; opacity: 0; transition: opacity 0.6s; }
+  #portrait-frame.visible { display: inline-block; opacity: 1; }
+  #portrait { width: 460px; height: 280px; border: 4px double #fff;
+    box-shadow: 0 0 60px rgba(255,0,255,0.5); display: none; opacity: 0; margin: 0 auto;
+    object-fit: cover; background: #000; transition: opacity 0.6s; }
   #portrait.visible { display: block; opacity: 1; }
   #dbg { position: absolute; bottom: 8px; right: 8px; font-size: 10px; color: #555;
     font-family: monospace; background: rgba(0,0,0,0.4); padding: 2px 5px; border: 1px solid #222; z-index: 60; }
@@ -69,13 +75,13 @@
 <div id="stage">
   <canvas id="backdrop"></canvas>
   <canvas id="anim"></canvas>
-  <canvas id="game" width="640" height="480"></canvas>
-  <div id="scrollwrap"><div id="scroll">THE KING'S RULE  ·  SUNBURST COMMUNICATIONS 1983  ·  APPLE IIc TERMINAL SIMULATION  ·  DEVELOPER: RIVER LYLE R.  ·  NINE CHAMBERS  ·  EIGHT GUARDS  ·  THEN THE KING  ·  GATE GUARD  ·  HALL WARDEN  ·  TOWER SENTRY  ·  CHAMBER KEEP  ·  VAULT WARDEN  ·  KEEP GUARDIAN  ·  SENTINEL PRIME  ·  DARK SENTINEL  ·  THE KING  ·  CYPHER PATTERNS: ADD  ·  SUBTRACT  ·  MULTIPLY  ·  DIVIDE  ·  SQUARES  ·  CUBES  ·  FIBONACCI  ·  ALTERNATING  ·  PRIMES  ·  THREE KEYS GIVEN  ·  GUESS THE FOURTH  ·  THREE STRIKES AND YOU ARE CAST OUT  ·  THE KING DENIES EVERY GUESS  ·  NO VICTORY  ·  PRESS ENTER TO PLAY  ·  ? KEY FOR HINT  ·  0-9 DIGITS  ·  ENTER SUBMITS  ·  BACKSPACE DELETES  ·  COPPER BAR ANIMATION  ·  ASCII TERMINAL GRAPHICS  ·  MEDIEVAL CASTLE SOUNDTRACK  ·  FAILURE ANIMATIONS: KICKOUT  ·  DUNGEON  ·  EXECUTE  ·  KING EXECUTE  ·  GAME OVER  ·  CREDITS  ·  ENDLESS REPLAYS</div></div>
   <div id="ui">
     <div class="ui-strike" id="strike">STRIKE 0/3</div>
     <div class="ui-hint" id="hint">?</div>
   </div>
-  <div id="portrait-wrap"><img id="portrait" src="" alt=""></div>
+  <div id="portrait-wrap"><div id="portrait-frame"><img id="portrait" src="" alt=""></div></div>
+  <canvas id="game" width="640" height="480"></canvas>
+  <div id="scrollwrap"><div id="scroll">THE KING'S RULE  ·  SUNBURST COMMUNICATIONS 1983  ·  APPLE IIc TERMINAL SIMULATION  ·  DEVELOPER: RIVER LYLE R.  ·  NINE CHAMBERS  ·  EIGHT GUARDS  ·  THEN THE KING  ·  GATE GUARD  ·  HALL WARDEN  ·  TOWER SENTRY  ·  CHAMBER KEEP  ·  VAULT WARDEN  ·  KEEP GUARDIAN  ·  SENTINEL PRIME  ·  DARK SENTINEL  ·  THE KING  ·  CYPHER PATTERNS: ADD  ·  SUBTRACT  ·  MULTIPLY  ·  DIVIDE  ·  SQUARES  ·  CUBES  ·  FIBONACCI  ·  ALTERNATING  ·  PRIMES  ·  THREE KEYS GIVEN  ·  GUESS THE FOURTH  ·  THREE STRIKES AND YOU ARE CAST OUT  ·  THE KING DENIES EVERY GUESS  ·  NO VICTORY  ·  PRESS ENTER TO PLAY  ·  ? KEY FOR HINT  ·  0-9 DIGITS  ·  ENTER SUBMITS  ·  BACKSPACE DELETES  ·  COPPER BAR ANIMATION  ·  ASCII TERMINAL GRAPHICS  ·  MEDIEVAL CASTLE SOUNDTRACK  ·  FAILURE ANIMATIONS: KICKOUT  ·  DUNGEON  ·  EXECUTE  ·  KING EXECUTE  ·  GAME OVER  ·  CREDITS  ·  ENDLESS REPLAYS</div></div>
   <div id="dbg">PHASE: INTRO</div>
 
   <div id="modal-intro-anim" class="modal visible">
@@ -236,141 +242,265 @@ function sfxIntro(){ const c=audio(); if(!c)return; const t=c.currentTime;
 
 /* ======================================================================== ANIMATIONS ======================================================================== */
 const animCanvas=document.getElementById('anim'); const animCtx=animCanvas.getContext('2d');
-const backCanvas=document.getElementById('backdrop'); const backCtx=backCtx;
+const backCanvas=document.getElementById('backdrop'); const backCtx=backCanvas.getContext('2d');
 function resizeBackdrop(){ backCanvas.width=window.innerWidth; backCanvas.height=window.innerHeight; }
 window.addEventListener('resize',resizeBackdrop);
 resizeBackdrop();
 
-// Pixelated tree helper — Eye of the Beholder style, cyan/violet dots
-function drawPixelTree(ctx,x,y,colorSet){
-  const trunk=colorSet[0]; const leafC=colorSet[1]; const leafV=colorSet[2]; const leafD=colorSet[3];
-  // trunk (3x5 pixels)
-  ctx.fillStyle=trunk;
-  ctx.fillRect(x+1,y+5,2,5);
-  // foliage — pixelated canopy
-  ctx.fillStyle=leafC;
-  ctx.fillRect(x,y,1,1); ctx.fillRect(x+2,y,1,1); ctx.fillRect(x+4,y,1,1);
-  ctx.fillRect(x-1,y+1,1,1); ctx.fillRect(x+1,y+1,1,1); ctx.fillRect(x+3,y+1,1,1); ctx.fillRect(x+5,y+1,1,1);
-  ctx.fillStyle=leafV;
-  ctx.fillRect(x,y+2,1,1); ctx.fillRect(x+2,y+2,1,1); ctx.fillRect(x+4,y+2,1,1);
-  ctx.fillRect(x-1,y+3,1,1); ctx.fillRect(x+1,y+3,1,1); ctx.fillRect(x+3,y+3,1,1); ctx.fillRect(x+5,y+3,1,1);
-  ctx.fillStyle=leafC;
-  ctx.fillRect(x+1,y+4,1,1); ctx.fillRect(x+3,y+4,1,1);
-  ctx.fillStyle=leafD;
-  ctx.fillRect(x+2,y+4,1,1);
-}
 
-// Draw pixelated forest trees at screen edges only — outside the game card
-function drawBackdropTrees(){
+
+// Level-aware backdrop: forest (Room 1) fades into castle ramparts, throne room (Room 9) no forest
+function drawBackdropTrees(level){
   const w=backCanvas.width, h=backCanvas.height;
   backCtx.fillStyle='#020204'; backCtx.fillRect(0,0,w,h);
-  const cx=Math.sin(animTimer*0.05)*2;
-  const cy=Math.cos(animTimer*0.04)*1.5;
-  const trunk='#3a2a1a';
-  const trunkDark='#2a1a0e';
+  const cx=Math.sin(animTimer*0.04)*3;
+  const cy=Math.cos(animTimer*0.03)*2;
+
+  // Forest strength fades from 1.0 (Room 1) to 0.0 (Room 9)
+  const forest = Math.max(0, (9 - level) / 8);
+  // Castle strength grows from 0.0 to 1.0
+  const castle = Math.min(1, (level - 1) / 8);
+
+  const trunk='#4a3a2a';
+  const trunkDark='#2a1a12';
   const leafCyan='#00ffff';
   const leafViolet='#ff00ff';
   const leafDeep='#8a2be2';
   const leafPale='#aaffff';
-  const trunkW=6, trunkH=14;
+  const grass='#1a0a0a';
 
-  // Helper: draw a pixelated standing tree at (x,y) facing viewer
-  function standTree(x,y,h,scale){
-    // trunk base
+  // Stone castle colors
+  const stoneLight='#8a8a8a';
+  const stoneMid='#5a5a5a';
+  const stoneDark='#3a3a3a';
+  const crenelDark='#1a1a1a';
+
+  // Seeded random for consistent randomness per level
+  let seed = level * 97531;
+  function seededRand(){
+    seed = (seed * 16807 + 12345) % 2147483647;
+    return seed / 2147483647;
+  }
+
+  // Helper: draw an upclose pixelated standing tree with random size
+  function standTree(x, baseY, trunkH, canopyW, scale){
+    const trunkW0 = 8;
+    const cx_ = x + (trunkW0*scale/2) - (canopyW*scale/2);
     backCtx.fillStyle=trunk;
-    backCtx.fillRect(x, y-trunkH, trunkW*scale, trunkH);
+    backCtx.fillRect(x, baseY-trunkH, trunkW0*scale, trunkH);
     backCtx.fillStyle=trunkDark;
-    backCtx.fillRect(x+trunkW*scale-2, y-trunkH+2, 2, trunkH-4);
-    // canopy layers - real tree silhouette, pixelated
-    const layers = Math.floor(h/8);
+    backCtx.fillRect(x+trunkW0*scale-2, baseY-trunkH+2, 2, trunkH-4);
+    const layers = Math.floor(canopyW/4);
     for(let l=0; l<layers; l++){
-      const ly = y - trunkH - (l*7);
-      const wd = Math.max(2, Math.floor(scale*(layers-l)*1.5));
-      const cx_ = x + (trunkW*scale/2) - (wd/2);
-      // outer cyan shell
+      const ly = baseY - trunkH - (l*6);
+      const wd = Math.max(2, Math.floor(scale*(layers-l)*2.2));
+      const tx_ = cx_ + Math.floor((canopyW*scale - wd)/2);
       backCtx.fillStyle=leafCyan;
-      backCtx.fillRect(cx_, ly, wd, 2);
-      backCtx.fillRect(cx_, ly+2, 1, 3);
-      backCtx.fillRect(cx_+wd-1, ly+2, 1, 3);
-      // violet inner
+      backCtx.fillRect(tx_, ly, wd, 2);
+      backCtx.fillRect(tx_, ly+2, 1, 3);
+      backCtx.fillRect(tx_+wd-1, ly+2, 1, 3);
       backCtx.fillStyle=leafViolet;
-      backCtx.fillRect(cx_+1, ly+3, Math.max(1,wd-2), 2);
-      backCtx.fillRect(cx_+1, ly+5, Math.max(1,wd-2), 1);
-      // deep violet center accent
+      backCtx.fillRect(tx_+1, ly+3, Math.max(1,wd-2), 2);
+      backCtx.fillRect(tx_+1, ly+5, Math.max(1,wd-2), 1);
       if(wd>4){
         backCtx.fillStyle=leafDeep;
-        backCtx.fillRect(cx_+Math.floor(wd/2), ly+4, 1, 2);
+        backCtx.fillRect(tx_+Math.floor(wd/2), ly+4, 1, 2);
       }
-      // pale cyan highlights
       backCtx.fillStyle=leafPale;
-      backCtx.fillRect(cx_+Math.floor(wd/3), ly+1, 1, 1);
+      backCtx.fillRect(tx_+Math.floor(wd/3), ly+1, 1, 1);
     }
-    // top crown
     backCtx.fillStyle=leafViolet;
-    backCtx.fillRect(x+Math.floor(trunkW*scale/2)-1, y-trunkH-(layers*7)-2, 2, 2);
+    backCtx.fillRect(x+Math.floor(trunkW0*scale/2)-1, baseY-trunkH-(layers*6)-2, 2, 2);
     backCtx.fillStyle=leafCyan;
-    backCtx.fillRect(x+Math.floor(trunkW*scale/2)-2, y-trunkH-(layers*7)-1, 1, 1);
-    backCtx.fillRect(x+Math.floor(trunkW*scale/2)+1, y-trunkH-(layers*7)-1, 1, 1);
+    backCtx.fillRect(x+Math.floor(trunkW0*scale/2)-2, baseY-trunkH-(layers*6)-1, 1, 1);
+    backCtx.fillRect(x+Math.floor(trunkW0*scale/2)+1, baseY-trunkH-(layers*6)-1, 1, 1);
   }
 
-  // Ground fog line at bottom edge
-  backCtx.fillStyle='#0a0a0a';
-  backCtx.fillRect(0, h-12, w, 12);
-  backCtx.fillStyle=leafDeep;
-  backCtx.fillRect(0, h-10, w, 2);
-
-  // LEFT border forest - trees standing from bottom up
-  for(let ty=h-60; ty>40; ty-=75){
-    const hgt = 40 + Math.sin(ty*0.07)*30;
-    const sc = 0.7 + Math.sin(ty*0.1)*0.4;
-    standTree(14+cx, ty, hgt, sc);
-    standTree(28+cx, ty-40, hgt*0.6, sc*0.6);
+  // Helper: draw castle rampart battlements
+  function drawRampart(x, y, height, width){
+    backCtx.fillStyle=stoneMid;
+    backCtx.fillRect(x, y-height, width, height);
+    backCtx.fillStyle=stoneLight;
+    for(let d=0; d<Math.floor(width/12); d++){
+      backCtx.fillRect(x+2+d*12, y-height+2, 4, 4);
+      backCtx.fillRect(x+7+d*12, y-height+6, 4, 4);
+    }
+    backCtx.fillStyle=stoneDark;
+    for(let d=0; d<Math.floor(width/15); d++){
+      backCtx.fillRect(x+4+d*15, y-height+4, 2, 6);
+      backCtx.fillRect(x+11+d*15, y-height+2, 2, 6);
+    }
+    // crenellations
+    backCtx.fillStyle=stoneDark;
+    for(let c=0; c<Math.floor(width/14); c++){
+      backCtx.fillRect(x+3+c*14, y-height-6, 8, 6);
+    }
+    // arrow slit
+    backCtx.fillStyle=crenelDark;
+    backCtx.fillRect(x+Math.floor(width/2)-1, y-height+10, 2, 8);
+    backCtx.fillRect(x+Math.floor(width/2)+1, y-height+14, 2, 4);
   }
-  // Extra left edge trees near top
-  standTree(8+cx, 60, 50, 0.8);
-  standTree(22+cx, 100, 35, 0.6);
 
-  // RIGHT border forest
-  for(let ty=h-60; ty>40; ty-=75){
-    const hgt = 40 + Math.sin(ty*0.07+2)*30;
-    const sc = 0.7 + Math.sin(ty*0.1+2)*0.4;
-    standTree(w-20-cx, ty, hgt, sc);
-    standTree(w-34-cx, ty-40, hgt*0.6, sc*0.6);
+  // Helper: draw castle turret
+  function drawTurret(x, y, height){
+    backCtx.fillStyle=stoneMid;
+    backCtx.fillRect(x, y-height, 30, height);
+    backCtx.fillStyle=stoneLight;
+    backCtx.fillRect(x+4, y-height+4, 4, 6);
+    backCtx.fillRect(x+22, y-height+2, 4, 6);
+    backCtx.fillStyle=stoneDark;
+    backCtx.fillRect(x+10, y-height+6, 2, 6);
+    backCtx.fillRect(x+18, y-height+4, 2, 6);
+    backCtx.fillStyle=stoneDark;
+    backCtx.fillRect(x-2, y-height-6, 6, 6);
+    backCtx.fillRect(x+26, y-height-6, 6, 6);
+    backCtx.fillStyle=crenelDark;
+    backCtx.fillRect(x+14, y-height+8, 2, 6);
   }
-  standTree(w-10-cx, 60, 50, 0.8);
-  standTree(w-24-cx, 100, 35, 0.6);
 
-  // TOP border forest - trees across the top
-  for(let tx=40; tx<w-40; tx+=85){
-    const hgt = 35 + Math.sin(tx*0.09)*25;
-    const sc = 0.6 + Math.sin(tx*0.13)*0.3;
-    standTree(tx+cx, 24+cy, hgt, sc);
+  // Ground strip
+  backCtx.fillStyle=grass;
+  backCtx.fillRect(0, h-34, w, 34);
+  backCtx.fillStyle=trunkDark;
+  backCtx.fillRect(0, h-32, w, 2);
+
+  // --- FOREST LAYER (fades out as level increases) ---
+  if(forest > 0){
+    backCtx.globalAlpha = forest;
+
+    // Randomized trees from big(left) to small(right) across full screen width
+    const treeCount = Math.floor(6 + forest * 8); // 6-14 trees
+    const columnWidth = w / treeCount;
+
+    for(let i=0; i<treeCount; i++){
+      const colLeft = i * columnWidth;
+      const x = colLeft + seededRand() * (columnWidth - 60);
+      // Size goes from big (left, i=0) to small (right, i=treeCount-1)
+      const sizeProgress = i / Math.max(1, treeCount - 1);
+      const baseH = 40 + seededRand() * 50;
+      const hgt = baseH * (1 - sizeProgress * 0.5) * forest;
+      const baseCW = 30 + seededRand() * 40;
+      const cw = baseCW * (1 - sizeProgress * 0.4);
+      const sc = 0.6 + seededRand() * 0.6;
+      const sway = Math.sin(x*0.02 + animTimer*0.05 + i)*2;
+      standTree(x + sway, h-34, hgt, cw, sc);
+    }
+
+    // Background smaller trees
+    backCtx.globalAlpha = forest * 0.45;
+    const backTreeCount = Math.floor(4 + forest * 6);
+    const backColWidth = w / backTreeCount;
+    for(let i=0; i<backTreeCount; i++){
+      const colLeft = i * backColWidth;
+      const x = colLeft + seededRand() * (backColWidth - 40);
+      const sizeProgress = i / Math.max(1, backTreeCount - 1);
+      const hgt = (25 + seededRand() * 25) * (1 - sizeProgress * 0.5);
+      const cw = (20 + seededRand() * 20) * (1 - sizeProgress * 0.3);
+      const sc = 0.4 + seededRand() * 0.3;
+      const sway = Math.sin(x*0.03 + animTimer*0.03 + i)*1.5;
+      standTree(x + sway, h-24, hgt, cw, sc);
+    }
+    backCtx.globalAlpha = 1.0;
+
+    // Forest floor accents across width
+    backCtx.fillStyle=leafCyan;
+    for(let i=0;i<w;i+=18){
+      backCtx.fillRect(i+Math.sin(i*0.05+animTimer)*2, h-28, 2, 2);
+    }
+    backCtx.fillStyle=leafViolet;
+    for(let i=9;i<w;i+=18){
+      backCtx.fillRect(i+Math.cos(i*0.05+animTimer)*2, h-26, 2, 2);
+    }
   }
-  // Extra top trees
-  standTree(100+cx, 40, 45, 0.9);
-  standTree(w-100-cx, 40, 45, 0.9);
 
-  // BOTTOM border forest - trees across the bottom
-  for(let tx=40; tx<w-40; tx+=85){
-    const hgt = 45 + Math.sin(tx*0.09+3)*30;
-    const sc = 0.7 + Math.sin(tx*0.13+3)*0.4;
-    standTree(tx+cx, h-16-cy, hgt, sc);
+  // --- CASTLE LAYER (fades in as level increases) ---
+  if(castle > 0){
+    backCtx.globalAlpha = castle;
+
+    // Stone ground/courtyard
+    backCtx.fillStyle=stoneDark;
+    backCtx.fillRect(0, h-34, w, 34);
+    backCtx.fillStyle=stoneMid;
+    backCtx.fillRect(0, h-32, w, 30);
+    backCtx.fillStyle=stoneLight;
+    for(let i=0;i<w;i+=40){
+      backCtx.fillRect(i, h-28, 3, 2);
+      backCtx.fillRect(i+20, h-22, 3, 2);
+    }
+
+    // Randomized ramparts from big(left) to small(right) across full width
+    const rampartCount = Math.floor(4 + castle * 5); // 4-9 ramparts
+    const rampartColWidth = w / rampartCount;
+    for(let i=0; i<rampartCount; i++){
+      const colLeft = i * rampartColWidth;
+      const x = colLeft + seededRand() * Math.max(10, rampartColWidth - 80);
+      const sizeProgress = i / Math.max(1, rampartCount - 1);
+      const width = Math.floor(50 + seededRand() * 50) * (1 - sizeProgress * 0.4);
+      const height = Math.floor(35 + seededRand() * 40) * (1 - sizeProgress * 0.3);
+      drawRampart(x, h-34, height, Math.max(30, width));
+    }
+
+    // Randomized turrets
+    const turretCount = Math.floor(3 + castle * 4); // 3-7 turrets
+    const turretColWidth = w / turretCount;
+    for(let i=0; i<turretCount; i++){
+      const colLeft = i * turretColWidth;
+      const x = colLeft + seededRand() * Math.max(10, turretColWidth - 40);
+      const sizeProgress = i / Math.max(1, turretCount - 1);
+      const height = Math.floor(60 + seededRand() * 40) * (1 - sizeProgress * 0.2);
+      drawTurret(x, h-34, Math.max(40, height));
+    }
+
+    // Magic cyan/violet accents on castle
+    backCtx.fillStyle=leafCyan;
+    for(let i=0; i<5*castle; i++){
+      backCtx.fillRect(seededRand()*(w-4)+2, h-80+seededRand()*40, 2, 4+seededRand()*8);
+    }
+    backCtx.fillStyle=leafViolet;
+    for(let i=0; i<5*castle; i++){
+      backCtx.fillRect(seededRand()*(w-4)+2, h-80+seededRand()*40, 2, 4+seededRand()*8);
+    }
+
+    // Throne room indicators for Room 9
+    if(level === 9){
+      backCtx.fillStyle='#4a004a';
+      backCtx.fillRect(w/2-60, h-30, 120, 26);
+      backCtx.fillStyle=leafViolet;
+      backCtx.fillRect(w/2-56, h-26, 112, 2);
+      backCtx.fillStyle=stoneDark;
+      backCtx.fillRect(w/2-25, h-44, 50, 16);
+      backCtx.fillStyle=leafViolet;
+      backCtx.fillRect(w/2-21, h-42, 8, 12);
+      backCtx.fillRect(w/2+13, h-42, 8, 12);
+      backCtx.fillStyle=leafCyan;
+      backCtx.fillRect(w/2-13, h-44, 6, 14);
+      backCtx.fillStyle=leafViolet;
+      backCtx.fillRect(w/2-70, h-70, 10, 30);
+      backCtx.fillRect(w/2+60, h-70, 10, 30);
+      backCtx.fillStyle=leafCyan;
+      backCtx.fillRect(w/2-68, h-68, 6, 4);
+      backCtx.fillRect(w/2+62, h-68, 6, 4);
+    }
+
+    backCtx.globalAlpha = 1.0;
   }
-  standTree(120+cx, h-20-cy, 55, 1.0);
-  standTree(w-120-cx, h-20-cy, 55, 1.0);
 
-  // Corner pixel accents - real tree clusters
-  backCtx.fillStyle=leafCyan;
+  // Corner vignettes
+  if(level === 9){
+    backCtx.fillStyle=stoneDark;
+  } else if(forest > castle){
+    backCtx.fillStyle=leafDeep;
+  } else {
+    backCtx.fillStyle=stoneMid;
+  }
   backCtx.fillRect(0,0,8,8); backCtx.fillRect(w-8,0,8,8);
   backCtx.fillRect(0,h-8,8,8); backCtx.fillRect(w-8,h-8,8,8);
-  backCtx.fillStyle=leafViolet;
+  backCtx.fillStyle=level === 9 ? leafViolet : (forest > castle ? leafPale : stoneLight);
   backCtx.fillRect(2,2,4,4); backCtx.fillRect(w-6,2,4,4);
   backCtx.fillRect(2,h-6,4,4); backCtx.fillRect(w-6,h-6,4,4);
-  backCtx.fillStyle=leafDeep;
-  backCtx.fillRect(4,4,2,2); backCtx.fillRect(w-4,4,2,2);
-  backCtx.fillRect(4,h-4,2,2); backCtx.fillRect(w-4,h-4,2,2);
 }
-/* ======================================================================== INPUT ======================================================================== */
+
+/* ======================================================================== ANIMATION STATE ======================================================================== */
 let animActive=false, animTimer=0, animType='';
 let animX=0, animDoor=0, animBars=0, animAxe=0, animGoBars=0, animShake=0, animDust=[];
 
@@ -390,7 +520,6 @@ function drawParticle(x,y,color,life){ animCtx.fillStyle=color; animCtx.globalAl
 
 function drawAnim(){
   if(!animActive){ requestAnimationFrame(drawAnim); return; }
-  animTimer++;
   const w=animCanvas.width, h=animCanvas.height;
   animCtx.fillStyle='#000'; animCtx.fillRect(0,0,w,h);
   const sx=animShake>0?(Math.random()-0.5)*animShake:0;
@@ -513,10 +642,10 @@ function generateRoom(level){
       hint:'UNKNOWN CYPHER', proof:[], color, face, failText:'OFF WITH HIS HEAD.', pattern:'king', isKing:true };
   }
 
-  // Exponential difficulty — hard cap at 3 digits (999 max), never more
+  // Exponential difficulty — numbers grow with level, hard cap at 3 digits (999)
   const exp = Math.pow(level, 1.7);
-  const baseMax = Math.min(999, Math.max(30, Math.floor(exp * 18)));
-  const baseMin = Math.max(3, Math.floor(exp * 4));
+  const baseMax = Math.min(900, Math.max(25, Math.floor(exp * 20)));
+  const baseMin = Math.max(3, Math.floor(exp * 3));
 
   // Cipherology pattern pool expands progressively from room 1-8
   let allowedPatterns = [0]; // add — always available (easiest)
@@ -541,77 +670,102 @@ function generateRoom(level){
     pattern = 'add';
   } else if(p === 1){ // SUBTRACT
     const st = randInt(1, Math.max(1, Math.floor((baseMax - baseMin) / 5)));
-    const s = randInt(baseMin + 3 * st, Math.min(baseMax, 999));
+    // Guarantee s - 3*st >= 1 so answer is always positive
+    const s = randInt(baseMin + 3 * st + 1, Math.min(baseMax, 999));
     provided = [s, s - st, s - 2 * st];
     answer = s - 3 * st;
-    if(answer < 1){ answer = s + st; provided = [s, s - st, s]; hint = 'ADD ' + st; }
-    else hint = 'SUBTRACT ' + st;
+    hint = 'SUBTRACT ' + st;
     proof = [s + ' -' + st + ' = ' + (s - st), (s - st) + ' -' + st + ' = ' + (s - 2 * st), (s - 2 * st) + ' -' + st + ' = ' + answer];
     pattern = 'subtract';
   } else if(p === 2){ // MULTIPLY
-    const b = randInt(2, Math.max(2, Math.floor(Math.min(999, baseMax) / 5)));
+    // b*4 must be <= 999, so b <= 249
+    const maxB = Math.min(249, Math.max(2, Math.floor(baseMax / 2)));
+    const b = randInt(2, maxB);
     provided = [b, b * 2, b * 3];
     answer = b * 4;
-    if(answer > 999){ answer = b * 2; provided = [b, b]; hint = 'MULTIPLY BY ' + b; }
-    else hint = 'MULTIPLY BY ' + b;
+    hint = 'MULTIPLY BY ' + b;
     proof = [b + ' x1 = ' + b, b + ' x2 = ' + (b * 2), b + ' x3 = ' + (b * 3), ' so x4 = ' + answer];
     pattern = 'multiply';
   } else if(p === 3){ // DIVIDE
-    const b = randInt(3, Math.max(3, Math.floor(Math.min(999, baseMax) / 5)));
+    // b*4 must be <= 999, so b <= 249
+    const maxB = Math.min(249, Math.max(3, Math.floor(baseMax / 2)));
+    const b = randInt(3, maxB);
     provided = [b * 4, b * 3, b * 2];
     answer = b;
     hint = 'DIVIDE BY ' + b;
     proof = [(b * 4) + ' /4 = ' + b, (b * 3) + ' /3 = ' + b, (b * 2) + ' /2 = ' + b];
     pattern = 'divide';
   } else if(p === 4){ // SQUARES
-    const n = randInt(2, Math.max(2, Math.floor(Math.sqrt(Math.min(999, baseMax)))));
+    // (n+3)^2 <= 999, so n+3 <= 31, n <= 28
+    const maxN = Math.max(2, Math.floor(Math.sqrt(999)) - 3);
+    const n = randInt(2, maxN);
     provided = [n * n, (n + 1) * (n + 1), (n + 2) * (n + 2)];
     answer = (n + 3) * (n + 3);
-    if(answer > 999){ n = 2; provided = [n * n, (n + 1) * (n + 1), (n + 2) * (n + 2)]; answer = (n + 3) * (n + 3); hint = 'SQUARES'; }
-    else hint = 'SQUARES';
+    hint = 'SQUARES';
     proof = [n + '² = ' + (n * n), (n + 1) + '² = ' + ((n + 1) * (n + 1)), (n + 2) + '² = ' + ((n + 2) * (n + 2)), ' so ' + (n + 3) + '² = ' + answer];
     pattern = 'squares';
   } else if(p === 5){ // CUBES
-    const n = randInt(2, Math.max(2, Math.floor(Math.pow(Math.min(999, baseMax), 1/3))));
+    // (n+3)^3 <= 999, so n+3 <= 9, n <= 6
+    const maxN = Math.max(2, Math.floor(Math.pow(999, 1/3)) - 3);
+    const n = randInt(2, maxN);
     provided = [n * n * n, (n + 1) * (n + 1) * (n + 1), (n + 2) * (n + 2) * (n + 2)];
     answer = (n + 3) * (n + 3) * (n + 3);
-    if(answer > 999){ n = 2; provided = [n * n * n, (n + 1) * (n + 1) * (n + 1), (n + 2) * (n + 2) * (n + 2)]; answer = (n + 3) * (n + 3) * (n + 3); hint = 'CUBES'; }
-    else hint = 'CUBES';
+    hint = 'CUBES';
     proof = [n + '³ = ' + (n * n * n), (n + 1) + '³ = ' + ((n + 1) * (n + 1) * (n + 1)), (n + 2) + '³ = ' + ((n + 2) * (n + 2) * (n + 2)), ' so ' + (n + 3) + '³ = ' + answer];
     pattern = 'cubes';
   } else if(p === 6){ // FIBONACCI
-    const a = randInt(3, Math.min(baseMax, 400));
-    const b = randInt(5, Math.min(baseMax + 10, 500 - a));
+    // a + 2*b <= 999
+    const a = randInt(3, 400);
+    const b = randInt(5, Math.max(5, Math.floor((999 - a) / 2)));
     provided = [a, b, a + b];
     answer = a + 2 * b;
-    if(answer > 999){ answer = a + b; hint = 'FIBONACCI'; }
-    else hint = 'FIBONACCI';
+    hint = 'FIBONACCI';
     proof = [a + ' + ' + b + ' = ' + (a + b), b + ' + ' + (a + b) + ' = ' + answer];
     pattern = 'fibonacci';
   } else if(p === 7){ // ALTERNATING
-    const n = randInt(10, Math.min(baseMax + 20, 600));
-    const s = randInt(5, Math.max(5, Math.floor(Math.min(999, baseMax) / 4)));
-    const m = randInt(2, Math.max(2, Math.floor(Math.min(999, baseMax) / 6)));
+    // n + 2*s - m <= 999 and >= 1
+    const n = randInt(10, 500);
+    const s = randInt(5, Math.max(5, Math.floor((999 - n) / 3)));
+    const m = randInt(2, Math.max(2, Math.floor(s / 2)));
     provided = [n, n + s, n + s - m];
     answer = n + 2 * s - m;
-    if(answer > 999 || answer < 1){ answer = n + s - m; hint = 'ADD ' + s + ' SUB ' + m; }
-    else hint = 'ADD ' + s + ' SUB ' + m;
-    proof = [n + ' +' + s + ' = ' + (n + s), (n + s) + ' -' + m + ' = ' + (n + s - m), (n + s - m) + ' +' + s + ' = ' + answer];
-    pattern = 'alternating';
+    if(answer < 1 || answer > 999){
+      // Fallback to simple add with guaranteed valid params
+      const st = randInt(1, 30);
+      const s2 = randInt(5, Math.min(400, 999 - 4 * st));
+      provided = [s2, s2 + st, s2 + 2 * st];
+      answer = s2 + 3 * st;
+      hint = 'ADD ' + st;
+      proof = [s2 + ' +' + st + ' = ' + (s2 + st), (s2 + st) + ' +' + st + ' = ' + (s2 + 2 * st), (s2 + 2 * st) + ' +' + st + ' = ' + answer];
+      pattern = 'add';
+    } else {
+      hint = 'ADD ' + s + ' SUB ' + m;
+      proof = [n + ' +' + s + ' = ' + (n + s), (n + s) + ' -' + m + ' = ' + (n + s - m), (n + s - m) + ' +' + s + ' = ' + answer];
+      pattern = 'alternating';
+    }
   } else { // PRIMES — hardest
-    let cp = randInt(baseMin, Math.min(baseMax + 40, 900));
-    while(!isPrime(cp)) cp++; const p1 = cp;
-    cp = p1 + 1; while(!isPrime(cp)) cp++; const p2 = cp;
-    cp = p2 + 1; while(!isPrime(cp)) cp++; const p3 = cp;
+    // Find 4 consecutive primes where the 4th <= 999
+    let p1 = randInt(baseMin, Math.min(800, baseMax + 40));
+    while(!isPrime(p1)) p1++;
+    let p2 = p1 + 1; while(!isPrime(p2)) p2++;
+    let p3 = p2 + 1; while(!isPrime(p3)) p3++;
+    let ans = nextPrime(p3);
+    if(ans > 999){
+      // Use smaller primes
+      p1 = randInt(10, 200);
+      while(!isPrime(p1)) p1++;
+      p2 = p1 + 1; while(!isPrime(p2)) p2++;
+      p3 = p2 + 1; while(!isPrime(p3)) p3++;
+      ans = nextPrime(p3);
+    }
     provided = [p1, p2, p3];
-    answer = nextPrime(p3);
-    if(answer > 999){ answer = p3; hint = 'PRIMES'; provided = [p1, p2, p3]; }
-    else hint = 'PRIMES';
+    answer = ans;
+    hint = 'PRIMES';
     proof = [p1 + ' is prime', p2 + ' is prime', p3 + ' is prime', ' next prime = ' + answer];
     pattern = 'primes';
   }
 
-  // Final safety clamp — NEVER exceed 3 digits
+  // Final safety clamp — all values already guaranteed <= 999 by construction
   provided = provided.map(v => Math.min(Math.max(v, 0), 999));
   answer = Math.min(Math.max(answer, 0), 999);
 
@@ -665,7 +819,7 @@ function enterRoom(){
     hintVisible=false; hintTimer=0; revealedAnswer=null;
     document.getElementById('strike').textContent='STRIKE 0/3'; document.getElementById('hint').textContent='?';
     const p=document.getElementById('portrait'); p.src='assets/'+currentRoom.name.toLowerCase().replace(' ','_')+'.png';
-    p.classList.add('visible'); p.onerror=function(){ this.style.display='none'; };
+    p.classList.add('visible'); document.getElementById('portrait-frame').classList.add('visible'); p.onerror=function(){ this.style.opacity='0'; };
     document.getElementById('ui').classList.add('visible'); hideAllModals();
   }catch(e){
     gamePhase='ROOM'; setStatus('ROOM'); document.getElementById('ui').classList.add('visible'); hideAllModals();
@@ -681,6 +835,7 @@ function showFailure(){
   gamePhase='FAILURE'; setStatus('FAILURE');
   document.getElementById('ui').classList.remove('visible');
   document.getElementById('portrait').classList.remove('visible');
+    document.getElementById('portrait-frame').classList.remove('visible');
   const rm=currentRoom;
   document.getElementById('fail-title').textContent=rm?rm.name:'GUARD DEFEATED';
   document.getElementById('fail-guard').textContent=rm?rm.name:'THE GUARD';
@@ -696,7 +851,7 @@ function showGameOver(){
   document.getElementById('go-score').textContent='Chambers cleared: '+cleared+' / 8';
   document.getElementById('go-text').textContent='The King rejects your cypher.';
   document.getElementById('modal-gameover').classList.add('visible');
-  document.getElementById('ui').classList.remove('visible'); document.getElementById('portrait').classList.remove('visible');
+  document.getElementById('ui').classList.remove('visible'); document.getElementById('portrait').classList.remove('visible'); document.getElementById('portrait-frame').classList.remove('visible');
 }
 function showCredits(){
   stopAnim();
@@ -863,10 +1018,11 @@ function submitGuess(){
 
 /* ======================================================================== LOOP ======================================================================== */
 function loop(){
+  animTimer++;
   try{
     const t=audio()?audio().currentTime:0;
     if(t>0) tickMusic(t);
-    drawBackdropTrees();
+    drawBackdropTrees(Math.max(1, roomIdx + 1));
     tickScroll();
     drawScreen();
   }catch(e){ /* keep loop alive even if a frame errors */ }
