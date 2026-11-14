@@ -1,0 +1,84 @@
+THE KING'S RULE — HARDER CYPHERS EDITION
+=========================================
+How to open, and what is in this zip.
+Run time: everything here is offline-safe except where noted.
+
+
+1. THE GAME — JUST DOUBLE-CLICK IT
+----------------------------------
+    game.html
+
+That is the full 9-chamber game in HTML5 (it needs the assets/ folder that
+sits next to it — keep them together). Works offline, in any modern browser,
+no plugins, no internet.
+
+The flow is the original one, screen by screen, with nothing stacked or
+overlapping:
+
+    INTRO  ->  ENTER THE CASTLE (rules)  ->  CHAMBER 1 ... CHAMBER 9
+           ->  ACCESS GRANTED  (reward screen after a correct answer, ~1.2 s)
+           ->  CHAMBER CLEARED  (press ENTER)
+           ->  ... repeat for all nine chambers ...
+           ->  THE KING  ->  GAME OVER  ->  CREDITS  ->  INTRO again
+
+    A third wrong guess shows the guard's failure screen, plays the
+    kick-out / dungeon / execute animation, then GAME OVER and CREDITS.
+
+
+2. THE SWF PORT — SAME GAME, FLASH
+----------------------------------
+    kings_rule.html     <-- double-click this one (single file, 1.0 MB)
+
+It is the .swf embedded inside a page with the Ruffle Flash emulator, so it
+plays in Chrome / Edge / Firefox / Safari. Click once on the game area, then
+press ENTER.
+
+    kings_rule.swf      <-- the raw Flash file, for Ruffle or Adobe Flash Player
+                            MD5 c105ee1b24f0d0c9ad90b827b6e9260c   (782,819 bytes)
+
+Why did the .swf open in Winamp on your machine? Windows has .swf associated
+with Winamp there, so double-clicking handed a Flash movie to an audio player.
+The file itself is fine — use kings_rule.html and you never touch that
+association.
+
+Internet: kings_rule.html pulls Ruffle from a CDN on first load. If you have no
+connection, play game.html instead — it is fully local.
+
+
+3. THE HARDER CYPHERS (what changed in this build)
+--------------------------------------------------
+The old build was solvable with small numbers. This one is not:
+
+  * Keys and answers now run up to four digits (9999 max) — type up to 4 digits.
+  * Difficulty curve is quadratic, so chamber 8 is far past chamber 2.
+  * Hard patterns arrive much earlier: squares in chamber 4, cubes and
+    fibonacci in 5, alternating in 6, growing steps in 7, primes and
+    "double then subtract" compounds in 8.
+  * The King's three keys are random 4-digit numbers and he denies every guess,
+    exactly as in the original.
+
+Example challenges you will actually meet:
+    1024  1089  1156  ->  1225          (squares)
+    2683  2687  2689  ->  2693          (primes)
+    977   1910  3776  ->  7508          (double, then subtract 44)
+    2514  3276  4089  ->  4953          (steps grow by 192)
+    keys 127  109  91 ->  73            (subtract 18)
+
+
+4. CONTROLS
+-----------
+    0-9        type a digit (up to four)
+    ENTER      submit a guess / advance a screen
+    BACKSPACE  delete a digit
+    ?          hint — reveals the pattern rule
+
+
+5. FILES
+--------
+    game.html            HTML5 game (harder cyphers) — double-click
+    assets/              10 images used by game.html — keep next to it
+    kings_rule.html      SWF port in a single page — double-click
+    kings_rule.swf       the raw Flash file
+    README.md            technical notes on how the SWF was built
+
+Nothing is installed, nothing is written to your disk.

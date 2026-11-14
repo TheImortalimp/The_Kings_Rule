@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>THE KING'S RULE — Apple IIc Terminal (1983)</title>
+<title>THE KING'S RULE — Apple IIc Terminal (1983) — HARDER CYPHERS</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
@@ -14,7 +14,7 @@
     font-family: "Courier New", Courier, monospace; touch-action: none; cursor: none; }
   #stage { position: relative; width: 100vw; height: 100vh; background: #000;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    overflow: hidden; gap: 12px; }
+    overflow: hidden; gap: 10px; padding: 12px 0 56px 0; }
   canvas#anim { position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     pointer-events: none; z-index: 50; display: none; }
   canvas#backdrop { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -22,6 +22,7 @@
   canvas#anim { position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     pointer-events: none; z-index: 50; display: none; }
   canvas#game { image-rendering: pixelated; background: #000; border: 4px double #555;
+    width: min(640px, 88vw, 74vh); height: auto; aspect-ratio: 4 / 3;
     box-shadow: 0 0 60px rgba(0,255,65,0.06); display: block; margin: 0 auto; z-index: 10; position: relative; }
   #scrollwrap { position: absolute; bottom: 0; left: 0; right: 0; height: clamp(28px,4vw,40px);
     background: #000; border-top: 4px double var(--ink); overflow: hidden; z-index: 55;
@@ -58,16 +59,17 @@
   .pulse { animation: pulse 1.5s infinite; }
   @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(1.05); } }
   #portrait-wrap { width: 100%; text-align: center; padding: 10px 0 8px 0; box-sizing: border-box; z-index: 15; pointer-events: none; }
-  #portrait-frame { display: inline-block; border: 10px solid #4a3a2a;
+  #portrait-frame { display: inline-block; border: 8px solid #4a3a2a;
     border-image: linear-gradient(45deg, #8a8a8a, #4a3a2a, #2a1a12, #4a3a2a, #8a8a8a) 1;
     box-shadow: 0 0 100px rgba(255,0,255,0.6), 0 0 20px rgba(0,255,255,0.4);
     background: #0a0a0a; padding: 6px; display: none; opacity: 0; transition: opacity 0.6s; }
   #portrait-frame.visible { display: inline-block; opacity: 1; }
-  #portrait { width: 460px; height: 280px; border: 4px double #fff;
+  #portrait { width: min(460px, 42vh, 62vw); height: auto; aspect-ratio: 460 / 280;
+    border: 4px double #fff;
     box-shadow: 0 0 60px rgba(255,0,255,0.5); display: none; opacity: 0; margin: 0 auto;
     object-fit: cover; background: #000; transition: opacity 0.6s; }
   #portrait.visible { display: block; opacity: 1; }
-  #dbg { position: absolute; bottom: 8px; right: 8px; font-size: 10px; color: #555;
+  #dbg { position: absolute; bottom: 46px; right: 8px; font-size: 10px; color: #555;
     font-family: monospace; background: rgba(0,0,0,0.4); padding: 2px 5px; border: 1px solid #222; z-index: 60; }
 </style>
 </head>
@@ -107,6 +109,7 @@
         <div class="modal-line">Guess the 4th key from the pattern.</div>
         <div class="modal-line">Type digits 0-9, then Enter to submit.</div>
         <div class="modal-line">Backspace deletes. ? shows a hint.</div>
+        <div class="modal-line ora">Hard cyphers: answers can reach 4 digits.</div>
         <div class="modal-line red">3 strikes and you are cast out.</div>
         <div class="modal-line red">The King denies every guess.</div>
         <div class="modal-line yel" style="margin-top: 16px;">Press Enter to enter the castle</div>
@@ -620,8 +623,8 @@ function drawAnim(){
 }
 
 /* ======================================================================== CYPHER GENERATOR ======================================================================== */
-function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
-function isPrime(n){ if(n<2)return false; for(let i=2;i<=Math.sqrt(n);i++) if(n%i===0) return false; return true; }
+function randInt(min,max){ if(max<=min) return min; return Math.floor(Math.random()*(max-min+1))+min; }
+function isPrime(n){ if(n<2)return false; if(n%2===0) return n===2; for(let i=3;i*i<=n;i+=2) if(n%i===0) return false; return true; }
 function nextPrime(n){ let c=n+1; while(!isPrime(c)) c++; return c; }
 
 const GUARD_NAMES=['GATE GUARD','HALL WARDEN','TOWER SENTRY','CHAMBER KEEP','VAULT WARDEN','KEEP GUARDIAN','SENTINEL PRIME','DARK SENTINEL'];
@@ -629,6 +632,17 @@ const GUARD_COLORS=['#4a90e2','#ff6600','#7f3fff','#ff00ff','#803000','#401080',
 const GUARD_FACES=['#ff6600','#00ff41','#00ffff','#ff6600','#ffff44','#00ff41','#ff6600','#ff4444'];
 const FAIL_TEXTS=['THE GATE SLAMS SHUT.','WARDEN BARS YOUR PATH.','SENTRY SOUNDS ALARM.','KEEP GUARD THROWS YOU OUT.','VAULT LOCKS YOU INSIDE.','GUARDIAN DRAGS TO DUNGEON.','SENTINEL PRIME DELETES ACCESS.','DARK SENTINEL CONSUMES YOU.'];
 const FAIL_ANIM=['kickout','dungeon','kickout','dungeon','kickout','dungeon','kickout','execute'];
+
+/* ============================================================================
+   HARDER CYPHERS
+   Values up to 9999 (four-digit keys and answers), quadratic difficulty curve,
+   and the hard patterns unlock much earlier:
+     1 add, subtract      2 + multiply        3 + divide
+     4 + squares          5 + cubes, fibonacci
+     6 + alternating      7 + growing steps   8 + primes, compound
+   ========================================================================= */
+const MAXV = 9999;
+function clampV(v){ return Math.min(Math.max(v,0),MAXV); }
 
 function generateRoom(level){
   const isKing = level === 9;
@@ -638,120 +652,140 @@ function generateRoom(level){
   const face = isKing ? '#000000' : GUARD_FACES[idx];
   const failText = isKing ? 'OFF WITH HIS HEAD.' : FAIL_TEXTS[idx];
   if(isKing){
-    return { name, provided:[randInt(100,999),randInt(100,999),randInt(100,999)], answer:-1,
+    return { name, provided:[randInt(1000,MAXV),randInt(1000,MAXV),randInt(1000,MAXV)], answer:-1,
       hint:'UNKNOWN CYPHER', proof:[], color, face, failText:'OFF WITH HIS HEAD.', pattern:'king', isKing:true };
   }
 
-  // Exponential difficulty — numbers grow with level, hard cap at 3 digits (999)
-  const exp = Math.pow(level, 1.7);
-  const baseMax = Math.min(900, Math.max(25, Math.floor(exp * 20)));
-  const baseMin = Math.max(3, Math.floor(exp * 3));
+  const exp = Math.pow(level, 2.0);
+  const baseMax = Math.min(MAXV, Math.max(90, Math.floor(exp * 45)));
+  const baseMin = Math.max(12, Math.floor(Math.pow(level, 1.8) * 6));
 
-  // Cipherology pattern pool expands progressively from room 1-8
-  let allowedPatterns = [0]; // add — always available (easiest)
-  if(level >= 2) allowedPatterns.push(1); // subtract
-  if(level >= 3) allowedPatterns.push(2); // multiply
-  if(level >= 4) allowedPatterns.push(3); // divide
-  if(level >= 5) allowedPatterns.push(4); // squares
-  if(level >= 6) allowedPatterns.push(5, 6); // cubes, fibonacci
-  if(level >= 7) allowedPatterns.push(7); // alternating
-  if(level >= 8) allowedPatterns.push(8); // primes
+  let allowedPatterns = [0, 1];                                  // add, subtract
+  if(level >= 2) allowedPatterns.push(2);                        // multiply
+  if(level >= 3) allowedPatterns.push(3);                        // divide
+  if(level >= 4) allowedPatterns.push(4);                        // squares
+  if(level >= 5) allowedPatterns.push(5, 6);                     // cubes, fibonacci
+  if(level >= 6) allowedPatterns.push(7);                        // alternating
+  if(level >= 7) allowedPatterns.push(8);                        // growing steps
+  if(level >= 8) allowedPatterns.push(9, 10);                    // primes, compound
 
   const p = allowedPatterns[randInt(0, allowedPatterns.length - 1)];
   let provided = [], answer = 0, hint = '', proof = [], pattern = '';
 
-  if(p === 0){ // ADD — easiest
-    const st = randInt(1, Math.max(1, Math.floor((999 - baseMin) / 5)));
-    const s = randInt(baseMin, Math.min(baseMax, 999 - 4 * st));
-    provided = [s, s + st, s + 2 * st];
-    answer = s + 3 * st;
-    hint = 'ADD ' + st;
-    proof = [s + ' +' + st + ' = ' + (s + st), (s + st) + ' +' + st + ' = ' + (s + 2 * st), (s + 2 * st) + ' +' + st + ' = ' + answer];
+  if(p === 0){ // ADD
+    const stMax = Math.max(2, Math.min(Math.floor((MAXV - baseMin) / 6), Math.floor(baseMax / 2)));
+    const st = randInt(Math.max(2, level), stMax);
+    let sMax = Math.min(baseMax, MAXV - 4 * st);
+    let st2 = st;
+    if(sMax < baseMin){ st2 = 2; sMax = Math.min(baseMax, MAXV - 8); }
+    const s = randInt(baseMin, sMax);
+    provided = [s, s + st2, s + 2 * st2];
+    answer = s + 3 * st2;
+    hint = 'ADD ' + st2;
+    proof = [s+' +'+st2+' = '+(s+st2), (s+st2)+' +'+st2+' = '+(s+2*st2), (s+2*st2)+' +'+st2+' = '+answer];
     pattern = 'add';
   } else if(p === 1){ // SUBTRACT
-    const st = randInt(1, Math.max(1, Math.floor((baseMax - baseMin) / 5)));
-    // Guarantee s - 3*st >= 1 so answer is always positive
-    const s = randInt(baseMin + 3 * st + 1, Math.min(baseMax, 999));
+    const stMax = Math.max(2, Math.floor((baseMax - baseMin) / 5));
+    let st = randInt(Math.max(2, level * 2), stMax);
+    let lo = baseMin + 3 * st + 1;
+    const hi = Math.min(baseMax, MAXV);
+    if(hi < lo){ st = 2; lo = baseMin + 7; }
+    const s = randInt(lo, hi);
     provided = [s, s - st, s - 2 * st];
     answer = s - 3 * st;
     hint = 'SUBTRACT ' + st;
-    proof = [s + ' -' + st + ' = ' + (s - st), (s - st) + ' -' + st + ' = ' + (s - 2 * st), (s - 2 * st) + ' -' + st + ' = ' + answer];
+    proof = [s+' -'+st+' = '+(s-st), (s-st)+' -'+st+' = '+(s-2*st), (s-2*st)+' -'+st+' = '+answer];
     pattern = 'subtract';
   } else if(p === 2){ // MULTIPLY
-    // b*4 must be <= 999, so b <= 249
-    const maxB = Math.min(249, Math.max(2, Math.floor(baseMax / 2)));
-    const b = randInt(2, maxB);
-    provided = [b, b * 2, b * 3];
+    const b = randInt(3, Math.min(2500, Math.max(6, Math.floor(baseMax / 3))));
+    provided = [b, b*2, b*3];
     answer = b * 4;
     hint = 'MULTIPLY BY ' + b;
-    proof = [b + ' x1 = ' + b, b + ' x2 = ' + (b * 2), b + ' x3 = ' + (b * 3), ' so x4 = ' + answer];
+    proof = [b+' x1 = '+b, b+' x2 = '+(b*2), b+' x3 = '+(b*3), ' so x4 = '+answer];
     pattern = 'multiply';
   } else if(p === 3){ // DIVIDE
-    // b*4 must be <= 999, so b <= 249
-    const maxB = Math.min(249, Math.max(3, Math.floor(baseMax / 2)));
-    const b = randInt(3, maxB);
-    provided = [b * 4, b * 3, b * 2];
+    const b = randInt(3, Math.min(2500, Math.max(6, Math.floor(baseMax / 2))));
+    provided = [b*4, b*3, b*2];
     answer = b;
     hint = 'DIVIDE BY ' + b;
-    proof = [(b * 4) + ' /4 = ' + b, (b * 3) + ' /3 = ' + b, (b * 2) + ' /2 = ' + b];
+    proof = [(b*4)+' /4 = '+b, (b*3)+' /3 = '+b, (b*2)+' /2 = '+b];
     pattern = 'divide';
   } else if(p === 4){ // SQUARES
-    // (n+3)^2 <= 999, so n+3 <= 31, n <= 28
-    const maxN = Math.max(2, Math.floor(Math.sqrt(999)) - 3);
-    const n = randInt(2, maxN);
-    provided = [n * n, (n + 1) * (n + 1), (n + 2) * (n + 2)];
-    answer = (n + 3) * (n + 3);
+    const nMax = Math.min(96, 6 + level * 10);
+    let nMin = Math.max(3, level * 3);
+    if(nMin >= nMax) nMin = nMax - 4;
+    const n = randInt(nMin, nMax);
+    provided = [n*n, (n+1)*(n+1), (n+2)*(n+2)];
+    answer = (n+3)*(n+3);
     hint = 'SQUARES';
-    proof = [n + '² = ' + (n * n), (n + 1) + '² = ' + ((n + 1) * (n + 1)), (n + 2) + '² = ' + ((n + 2) * (n + 2)), ' so ' + (n + 3) + '² = ' + answer];
+    proof = [n+'² = '+(n*n), (n+1)+'² = '+((n+1)*(n+1)), (n+2)+'² = '+((n+2)*(n+2)), ' so '+(n+3)+'² = '+answer];
     pattern = 'squares';
   } else if(p === 5){ // CUBES
-    // (n+3)^3 <= 999, so n+3 <= 9, n <= 6
-    const maxN = Math.max(2, Math.floor(Math.pow(999, 1/3)) - 3);
-    const n = randInt(2, maxN);
-    provided = [n * n * n, (n + 1) * (n + 1) * (n + 1), (n + 2) * (n + 2) * (n + 2)];
-    answer = (n + 3) * (n + 3) * (n + 3);
+    const nMax = Math.min(18, 3 + level * 2);
+    let nMin = Math.max(3, level * 2);
+    if(nMin >= nMax) nMin = nMax - 2;
+    const n = randInt(nMin, nMax);
+    provided = [n*n*n, (n+1)*(n+1)*(n+1), (n+2)*(n+2)*(n+2)];
+    answer = (n+3)*(n+3)*(n+3);
     hint = 'CUBES';
-    proof = [n + '³ = ' + (n * n * n), (n + 1) + '³ = ' + ((n + 1) * (n + 1) * (n + 1)), (n + 2) + '³ = ' + ((n + 2) * (n + 2) * (n + 2)), ' so ' + (n + 3) + '³ = ' + answer];
+    proof = [n+'³ = '+(n*n*n), (n+1)+'³ = '+((n+1)*(n+1)*(n+1)), (n+2)+'³ = '+((n+2)*(n+2)*(n+2)), ' so '+(n+3)+'³ = '+answer];
     pattern = 'cubes';
   } else if(p === 6){ // FIBONACCI
-    // a + 2*b <= 999
-    const a = randInt(3, 400);
-    const b = randInt(5, Math.max(5, Math.floor((999 - a) / 2)));
-    provided = [a, b, a + b];
-    answer = a + 2 * b;
+    const a = randInt(baseMin, Math.min(baseMax, 6000));
+    let bMin = a + 1;
+    const bMax = Math.floor((MAXV - a) / 2);
+    if(bMax <= bMin) bMin = bMax - 2;
+    const b = randInt(bMin, bMax);
+    provided = [a, b, a+b];
+    answer = a + 2*b;
     hint = 'FIBONACCI';
-    proof = [a + ' + ' + b + ' = ' + (a + b), b + ' + ' + (a + b) + ' = ' + answer];
+    proof = [a+' + '+b+' = '+(a+b), b+' + '+(a+b)+' = '+answer];
     pattern = 'fibonacci';
-  } else if(p === 7){ // ALTERNATING
-    // n + 2*s - m <= 999 and >= 1
-    const n = randInt(10, 500);
-    const s = randInt(5, Math.max(5, Math.floor((999 - n) / 3)));
-    const m = randInt(2, Math.max(2, Math.floor(s / 2)));
-    provided = [n, n + s, n + s - m];
-    answer = n + 2 * s - m;
-    if(answer < 1 || answer > 999){
-      // Fallback to simple add with guaranteed valid params
-      const st = randInt(1, 30);
-      const s2 = randInt(5, Math.min(400, 999 - 4 * st));
-      provided = [s2, s2 + st, s2 + 2 * st];
-      answer = s2 + 3 * st;
+  } else if(p === 7){ // ALTERNATING (+s then -m)
+    const n = randInt(baseMin, Math.min(baseMax, 4000));
+    const s = randInt(5, Math.max(6, Math.floor((MAXV - n) / 3)));
+    const m = randInt(2, Math.max(3, Math.floor(s / 2)));
+    provided = [n, n+s, n+s-m];
+    answer = n + 2*s - m;
+    if(answer < 1 || answer > MAXV){
+      const st = randInt(3, 40);
+      const s2 = randInt(baseMin, Math.min(baseMax, MAXV - 4*st));
+      provided = [s2, s2+st, s2+2*st];
+      answer = s2 + 3*st;
       hint = 'ADD ' + st;
-      proof = [s2 + ' +' + st + ' = ' + (s2 + st), (s2 + st) + ' +' + st + ' = ' + (s2 + 2 * st), (s2 + 2 * st) + ' +' + st + ' = ' + answer];
+      proof = [s2+' +'+st+' = '+(s2+st), (s2+st)+' +'+st+' = '+(s2+2*st), (s2+2*st)+' +'+st+' = '+answer];
       pattern = 'add';
     } else {
-      hint = 'ADD ' + s + ' SUB ' + m;
-      proof = [n + ' +' + s + ' = ' + (n + s), (n + s) + ' -' + m + ' = ' + (n + s - m), (n + s - m) + ' +' + s + ' = ' + answer];
+      hint = 'ADD ' + s + ' THEN SUB ' + m;
+      proof = [n+' +'+s+' = '+(n+s), (n+s)+' -'+m+' = '+(n+s-m), (n+s-m)+' +'+s+' = '+answer];
       pattern = 'alternating';
     }
-  } else { // PRIMES — hardest
-    // Find 4 consecutive primes where the 4th <= 999
-    let p1 = randInt(baseMin, Math.min(800, baseMax + 40));
+  } else if(p === 8){ // GROWING STEPS (second difference)
+    const k1 = randInt(baseMin, Math.min(baseMax, 3000));
+    const a = randInt(3, Math.max(4, Math.floor(k1 * 0.35)));
+    const d = randInt(1, Math.max(2, Math.floor(a / 2)));
+    provided = [k1, k1 + a, k1 + 2*a + d];
+    answer = k1 + 3*a + 3*d;
+    if(answer > MAXV){
+      const st = randInt(3, 30);
+      const s2 = randInt(baseMin, Math.min(baseMax, MAXV - 4*st));
+      provided = [s2, s2+st, s2+2*st];
+      answer = s2 + 3*st;
+      hint = 'ADD ' + st;
+      proof = [s2+' +'+st+' = '+(s2+st), (s2+st)+' +'+st+' = '+(s2+2*st), (s2+2*st)+' +'+st+' = '+answer];
+      pattern = 'add';
+    } else {
+      hint = 'STEPS GROW BY ' + d;
+      proof = [k1+' +'+a+' = '+(k1+a), (k1+a)+' +'+(a+d)+' = '+(k1+2*a+d), (k1+2*a+d)+' +'+(a+2*d)+' = '+answer];
+      pattern = 'growing';
+    }
+  } else if(p === 9){ // PRIMES
+    let p1 = randInt(baseMin, Math.min(9700, baseMax + 60));
     while(!isPrime(p1)) p1++;
     let p2 = p1 + 1; while(!isPrime(p2)) p2++;
     let p3 = p2 + 1; while(!isPrime(p3)) p3++;
     let ans = nextPrime(p3);
-    if(ans > 999){
-      // Use smaller primes
+    if(ans > MAXV){
       p1 = randInt(10, 200);
       while(!isPrime(p1)) p1++;
       p2 = p1 + 1; while(!isPrime(p2)) p2++;
@@ -761,15 +795,27 @@ function generateRoom(level){
     provided = [p1, p2, p3];
     answer = ans;
     hint = 'PRIMES';
-    proof = [p1 + ' is prime', p2 + ' is prime', p3 + ' is prime', ' next prime = ' + answer];
+    proof = [p1+' is prime', p2+' is prime', p3+' is prime', ' next prime = '+answer];
     pattern = 'primes';
+  } else { // COMPOUND: double, then subtract c
+    const c = randInt(3, Math.max(4, level * 6));
+    let k1Lo = Math.max(c + 3, baseMin);
+    const k1Hi = Math.min(baseMax, Math.floor((MAXV + 7 * c) / 8));
+    if(k1Hi <= k1Lo) k1Lo = Math.max(20, c + 3);
+    const k1 = randInt(k1Lo, k1Hi);
+    const k2 = 2*k1 - c;
+    const k3 = 2*k2 - c;
+    provided = [k1, k2, k3];
+    answer = 2*k3 - c;
+    hint = 'DOUBLE THEN SUBTRACT ' + c;
+    proof = [k1+' x2 -'+c+' = '+k2, k2+' x2 -'+c+' = '+k3, k3+' x2 -'+c+' = '+answer];
+    pattern = 'compound';
   }
 
-  // Final safety clamp — all values already guaranteed <= 999 by construction
-  provided = provided.map(v => Math.min(Math.max(v, 0), 999));
-  answer = Math.min(Math.max(answer, 0), 999);
+  provided = provided.map(clampV);
+  answer = clampV(answer);
 
-  return { name, provided, answer, hint, proof, color, face, failText, pattern, isKing: false };
+  return { name, provided, answer, hint, proof, color, face, failText, pattern, isKing:false };
 }
 
 /* ======================================================================== GAME STATE ======================================================================== */
@@ -871,6 +917,12 @@ function resetGame(){
 /* ======================================================================== RENDERER ======================================================================== */
 function puts(x,y,str,color){ gameCtx.fillStyle=color||CLR.ink; gameCtx.font='16px "Courier New"';
   gameCtx.fillText(str,x*10,y*20); }
+function drawCleanFrame(){
+  const W=62;
+  puts(0,0,'╔'+'═'.repeat(W)+'╗',CLR.cyn);
+  puts(0,23,'╚'+'═'.repeat(W)+'╝',CLR.cyn);
+  for(let r=1;r<=22;r++){ puts(0,r,'║',CLR.cyn); puts(63,r,'║',CLR.cyn); }
+}
 function drawBorderArt(){
   const W=62;
   const top='╔'+'═'.repeat(W)+'╗';
@@ -899,7 +951,7 @@ function drawScreen(){
     const sx=shake>0?(Math.random()-0.5)*shake:0; const sy=shake>0?(Math.random()-0.5)*shake:0;
     gameCtx.save(); gameCtx.translate(sx|0,sy|0); if(shake>0) shake*=0.82;
     if(flash>0){ flash--; gameCtx.fillStyle=flashCol||CLR.red; gameCtx.globalAlpha=0.3; gameCtx.fillRect(0,0,640,480); gameCtx.globalAlpha=1; }
-    if(gamePhase!=='ROOM'){
+    if(gamePhase!=='ROOM' && gamePhase!=='CLEAR'){
       drawBorderArt();
     }
     if(gamePhase==='ROOM' && currentRoom){
@@ -921,6 +973,19 @@ function drawScreen(){
         puts(2,16,'  HINT: '+rm.hint,CLR.cyn);
         hintTimer--;
       } else { hintVisible=false; }
+    } else if(gamePhase==='CLEAR' && currentRoom){
+      /* REWARD SCREEN: shown for ~1.2s after a correct answer, before CHAMBER CLEARED */
+      const rm=currentRoom;
+      drawCleanFrame();
+      puts(2,3,'=== CHAMBER '+(roomIdx+1)+' / 9 ===',CLR.cyn);
+      puts(2,5,'GUARD: '+rm.name,rm.color);
+      puts(2,7,'CYPHER KEYS:',CLR.wht);
+      puts(2,9,'  KEY 1: '+rm.provided[0]+'     KEY 2: '+rm.provided[1]+'     KEY 3: '+rm.provided[2],CLR.wht);
+      puts(2,11,'  KEY 4: '+rm.answer+'   <-- SOLVED',CLR.ink);
+      puts(2,14,'*** ACCESS GRANTED ***',CLR.ink);
+      puts(2,16,'CYPHER SOLVED - THE GUARD STEPS ASIDE',CLR.cyn);
+      puts(2,18,'CLEARED: '+cleared+' / 9',CLR.yel);
+      puts(2,20,'NEXT CHAMBER...',CLR.mag);
     } else if(gamePhase==='ROOM'){
       puts(2,12,'  PHASE: '+gamePhase,CLR.cyn);
       puts(2,14,'  ROOM: '+(roomIdx+1),CLR.yel);
@@ -947,7 +1012,7 @@ function handleKey(key){
     return;
   }
   if(gamePhase==='ROOM'){
-    if(key>='0'&&key<='9'&&guess.length<3){ guess+=key; document.getElementById('hint').textContent=guess; }
+    if(key>='0'&&key<='9'&&guess.length<4){ guess+=key; document.getElementById('hint').textContent=guess; }
     else if(key==='Backspace'){ guess=guess.slice(0,-1); document.getElementById('hint').textContent=guess.length>0?guess:'?'; }
     else if(key==='Enter'){ if(guess.length>0) submitGuess(); }
     else if(key==='?'){
