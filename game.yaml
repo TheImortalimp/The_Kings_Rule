@@ -5,8 +5,8 @@
 schema: kings-rule/game/1
 title: THE KING'S RULE
 subtitle: Apple IIc Terminal Simulation
-edition: Fair Cyphers
-version: 3.1.0
+edition: Fair Cyphers (no repeats)
+version: 3.1.1
 year: 1983
 original_concept: Sunburst Communications
 genre:
@@ -45,31 +45,57 @@ fairness:
   value_range: every key and answer is generated inside 1..9999 - nothing is clamped after the fact
   validation: each generated room is re-derived before it is shown; a room whose rule disagrees with its answer is rejected
   audit: 72000 rooms generated across both engines, 0 failures
+variety:
+  seed: 32-bit xorshift32 stream (identical in both engines), 2^31 starting points per run
+  rooms_remembered: 400 (newest first, per session; persisted in localStorage by the HTML5 build)
+  rerolls: up to 64 candidate rooms are tried before a seen room may repeat
+  distinct_rooms:
+  - chamber: 1
+    count: 1963
+  - chamber: 2
+    count: 4569
+  - chamber: 3
+    count: 87
+  - chamber: 4
+    count: 565
+  - chamber: 5
+    count: 66
+  - chamber: 6
+    count: 29576
+  - chamber: 7
+    count: 589
+  - chamber: 8
+    count: 3319
+  rule_variants:
+  - chamber: 3
+    variant: multiply by 2 (mostly) or 3
+  - chamber: 5
+    variant: the next square, every 2nd square, or every 3rd square
 difficulty:
-  model: exponential - the answer band is multiplied by ~1.9 every chamber
+  model: exponential - chamber n starts at 100 x 1.9^(n-1)
   pattern_axis: the rule itself also rises (+step, -step, x2, /2, squares, fibonacci, primes, two chained operations)
   bands:
   - chamber: 1
     answer_min: 100
-    answer_max: 155
+    answer_max: 250
   - chamber: 2
     answer_min: 190
-    answer_max: 294
+    answer_max: 475
   - chamber: 3
     answer_min: 368
-    answer_max: 552
+    answer_max: 896
   - chamber: 4
     answer_min: 685
-    answer_max: 1063
+    answer_max: 1249
   - chamber: 5
     answer_min: 1296
-    answer_max: 1936
+    answer_max: 3249
   - chamber: 6
     answer_min: 2476
-    answer_max: 3837
+    answer_max: 6190
   - chamber: 7
     answer_min: 4721
-    answer_max: 7297
+    answer_max: 9929
   - chamber: 8
     answer_min: 8938
     answer_max: 9999
@@ -118,7 +144,7 @@ chambers:
   portrait: assets/gate_guard.png
   pattern: add
   rule_example: ADD 10 TO EACH KEY
-  answer_band: 100-155
+  answer_band: 100-250
   animation: kickout
   taunts:
   - NOT EVEN THE GATE BELIEVES YOU.
@@ -132,7 +158,7 @@ chambers:
   portrait: assets/hall_warden.png
   pattern: subtract
   rule_example: SUBTRACT 20 FROM EACH KEY
-  answer_band: 190-294
+  answer_band: 190-475
   animation: dungeon
   taunts:
   - THE HALL ECHOES THAT MISTAKE.
@@ -144,9 +170,9 @@ chambers:
 - chamber: 3
   warden: TOWER SENTRY
   portrait: assets/tower_sentry.png
-  pattern: double
-  rule_example: DOUBLE EACH KEY
-  answer_band: 368-552
+  pattern: multiply
+  rule_example: DOUBLE EACH KEY (or MULTIPLY EACH KEY BY 3)
+  answer_band: 368-896
   animation: kickout
   taunts:
   - FROM UP HERE YOUR ARITHMETIC LOOKS SMALL.
@@ -160,7 +186,7 @@ chambers:
   portrait: assets/chamber_keep.png
   pattern: halve
   rule_example: HALVE EACH KEY
-  answer_band: 685-1063
+  answer_band: 685-1249
   animation: dungeon
   taunts:
   - HALF A GUESS IS NO GUESS.
@@ -174,7 +200,7 @@ chambers:
   portrait: assets/vault_warden.png
   pattern: squares
   rule_example: EACH KEY IS THE NEXT SQUARE
-  answer_band: 1296-1936
+  answer_band: 1296-3249
   animation: kickout
   taunts:
   - GOLD IS COUNTED. GUESSES ARE NOT FORGIVEN.
@@ -188,7 +214,7 @@ chambers:
   portrait: assets/keep_guardian.png
   pattern: fib
   rule_example: EACH KEY IS THE SUM OF THE TWO BEFORE
-  answer_band: 2476-3837
+  answer_band: 2476-6190
   animation: dungeon
   taunts:
   - I HAVE STOOD HERE SIX HUNDRED YEARS.
@@ -202,7 +228,7 @@ chambers:
   portrait: assets/sentinel_prime.png
   pattern: primes
   rule_example: THE KEYS ARE CONSECUTIVE PRIMES
-  answer_band: 4721-7297
+  answer_band: 4721-9929
   animation: kickout
   taunts:
   - YOUR GUESS DIVIDES EVENLY INTO FAILURE.
@@ -258,11 +284,11 @@ cypher_patterns:
     given: [322, 302, 282]
     answer: 262
     why: -20 each step
-- id: double
+- id: multiply
   chamber: 3
-  rule: each key is twice the one before
-  hint_text: DOUBLE EACH KEY
-  derivation: answer = 2 x key3
+  rule: each key is k times the one before (k = 2, sometimes 3)
+  hint_text: DOUBLE EACH KEY / MULTIPLY EACH KEY BY 3
+  derivation: answer = k x key3
   example:
     given: [48, 96, 192]
     answer: 384
@@ -278,9 +304,9 @@ cypher_patterns:
     why: /2 each step
 - id: squares
   chamber: 5
-  rule: the keys are consecutive squares
-  hint_text: EACH KEY IS THE NEXT SQUARE
-  derivation: answer = (sqrt(key3) + 1)^2
+  rule: the keys are squares, every step (or every 2nd / every 3rd)
+  hint_text: EACH KEY IS THE NEXT SQUARE / EVERY 2nd SQUARE / EVERY 3rd SQUARE
+  derivation: answer = (sqrt(key3) + step)^2
   example:
     given: [1681, 1764, 1849]
     answer: 1936

@@ -4,8 +4,8 @@
 schema: kings-rule/package/1
 package:
   name: kings-rule
-  edition: fair-cyphers
-  version: 3.1.0
+  edition: fair-cyphers-no-repeats
+  version: 3.1.1
   release_date: '2026-11-14'
   license: freeware / fan remake - see attribution
   language: en
@@ -28,8 +28,8 @@ entrypoints:
   notes: do not hand this to an audio player - Windows may map .swf to Winamp
 artifacts:
   kings_rule.swf:
-    bytes: 784741
-    md5: 816f3aa716d62797b0d8b836a9e3373e
+    bytes: 785426
+    md5: 112b69f74d0ae57f9a67ee45dcc182d7
     format: SWF v10 (CWS, zlib compressed), AVM2/AS3
     stage: 1024x768
     fps: 30
@@ -41,13 +41,13 @@ artifacts:
     - Ruffle 0.7.1
     - Adobe Flash Player projector
   kings_rule.html:
-    bytes: 1049749
-    md5: a6bd6c41ec2b17ffcdc6cc97d6c69a80
+    bytes: 1050661
+    md5: 3799241f52281105bd14353be80518ee
     self_contained: true
     external_dependency: https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle@0.7.1/ruffle.js
   game.html:
-    bytes: 62011
-    md5: 7b1c47c8e9a1901d51b3f553b4ecd483
+    bytes: 65321
+    md5: de686ceb20d55715c1efef0c171de097
     self_contained: false
     companion_folder: assets/
     runtime: vanilla JS + Canvas 2D + Web Audio, no libraries
@@ -95,6 +95,14 @@ verification:
   cypher_audit: 72000 generated rooms, 0 invalid, 0 where the stated rule disagrees with the accepted answer
   screenshots: kings_rule_swf/screenshots/ (SWF) and kings_rule_swf/screenshots/html/ (HTML5)
 changelog:
+- version: 3.1.1
+  date: '2026-11-14'
+  changes:
+  - 'variety: the seed is now a 32-bit xorshift32 stream with 2^31 starting points, replacing a 16-bit Lehmer generator that collided often'
+  - 'variety: contiguous exponential answer bands (2.5x span each) instead of narrow ones, so chambers hold hundreds to thousands of distinct rooms'
+  - 'variety: rule variants where a single rule would only ever give a handful of rooms - chamber 3 multiplies by 2 or 3, chamber 5 uses the next / every 2nd / every 3rd square'
+  - 'no repeats: the last 400 rooms dealt are remembered and up to 64 candidates are drawn to avoid repeating one; the HTML5 build persists the memory in localStorage'
+  - 'primes chamber no longer falls back to a tiny number when the chain runs past 9999 - the chain steps down instead'
 - version: 3.1.0
   date: '2026-11-14'
   changes:
@@ -127,25 +135,25 @@ changelog:
   - first single-file SWF port of the HTML5 remake
 files:
 - path: HOW-TO-OPEN.txt
-  bytes: 4614
-  md5: 2a382f926dfdf0cfd1128700a4327e68
+  bytes: 4912
+  md5: ab206e5a1d2fb6dd4d7b40d99505023f
 - path: README.md
-  bytes: 10606
-  md5: 521bee375c4829246d2571100277c321
+  bytes: 11448
+  md5: fbe71843b5dfa35159c799344c502c02
 - path: game.html
-  bytes: 62011
-  md5: 7b1c47c8e9a1901d51b3f553b4ecd483
+  bytes: 65321
+  md5: de686ceb20d55715c1efef0c171de097
 - path: game.yaml
-  bytes: 10707
-  md5: 9e07d1539bae356c9f506840649f4b13
+  bytes: 11543
+  md5: 103adf2b1b213b15ea05d4a4db16414a
 - path: kings_rule.html
-  bytes: 1049749
-  md5: a6bd6c41ec2b17ffcdc6cc97d6c69a80
+  bytes: 1050661
+  md5: 3799241f52281105bd14353be80518ee
 - path: kings_rule.swf
-  bytes: 784741
-  md5: 816f3aa716d62797b0d8b836a9e3373e
+  bytes: 785426
+  md5: 112b69f74d0ae57f9a67ee45dcc182d7
 - path: meta.yaml
-  bytes: 6444
+  bytes: 6417
   md5: self
 - path: assets/background.png
   bytes: 153691

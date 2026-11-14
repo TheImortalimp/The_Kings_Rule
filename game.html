@@ -646,7 +646,7 @@ const GUARD_NAMES=['GATE GUARD','HALL WARDEN','TOWER SENTRY','CHAMBER KEEP','VAU
 const GUARD_COLORS=['#4a90e2','#ff6600','#7f3fff','#ff00ff','#804020','#40a040','#00ffff','#9a9a9a'];
 const GUARD_FACES=['#ff6600','#00ff41','#00ffff','#ff6600','#ffff44','#00ff41','#ff6600','#ff4444'];
 const FAIL_ANIM=['kickout','dungeon','kickout','dungeon','kickout','dungeon','kickout','execute'];
-const LADDER=['add','sub','double','halve','squares','fib','primes','compound'];
+const LADDER=['add','sub','multiply','halve','squares','fib','primes','compound'];
 
 const GUARD_TAUNTS=[
   ['NOT EVEN THE GATE BELIEVES YOU.','I HAVE SEEN FARMERS GUESS BETTER.','ONE MORE AND THE PORTCULLIS STAYS SHUT.'],
@@ -676,14 +676,19 @@ function nextPrime(n){ let c=n+1; while(!isPrime(c)) c++; return c; }
 function isqrt(n){ let r=Math.floor(Math.sqrt(n)); while(r*r>n) r--; while((r+1)*(r+1)<=n) r++; return r; }
 function ceilDiv(a,b){ return Math.ceil(a/b); }
 
-/* deterministic, identical to the SWF build (Lehmer / modulus 65537) */
+/* xorshift32 - identical to the SWF build (both do int32 bitwise maths), so a
+   given seed deals the same room in either engine. 2^31 starting points, which
+   is what makes "the same room again" rare instead of likely. */
 function makeRnd(seed){
-  let s=seed%65537; if(s<0) s+=65537; if(s===0) s=1;
-  for(let i=0;i<4;i++){ s=(s*75+74)%65537; }
-  return { pick:function(lo,hi){ s=(s*75+74)%65537; if(hi<=lo) return lo; return lo + (s%(hi-lo+1)); } };
+  let s=(seed|0)&0x7FFFFFFF;
+  if(s===0) s=0x7F4A7C15&0x7FFFFFFF;
+  return {
+    next:function(){ s^=(s<<13); s^=(s>>>17); s^=(s<<5); s&=0x7FFFFFFF; return s; },
+    pick:function(lo,hi){ if(hi<=lo) return lo; return lo + (this.next()%(hi-lo+1)); }
+  };
 }
 
-function buildRoom(r, rnd, level, lo, hi){
+function buildKeys(r, rnd, level, lo, hi){
   const p=r.pattern;
   if(p==='add'){
     const stLo=Math.max(3,level*2+2);
@@ -709,14 +714,18 @@ function buildRoom(r, rnd, level, lo, hi){
     r.proof=[k1+' - '+st+' = '+k2, k2+' - '+st+' = '+k3, k3+' - '+st+' = ?'];
     return a;
   }
-  if(p==='double'){
-    const mLo=Math.max(3,ceilDiv(lo,8)), mHi=Math.min(1249,Math.floor(hi/8));
-    const m=rnd.pick(mLo,Math.max(mLo,mHi));
-    const k1=m,k2=2*m,k3=4*m;
+  if(p==='multiply'){
+    /* k is 2 most of the time and 3 sometimes: same rule, same band, roughly
+       double the pool of rooms */
+    const k = rnd.pick(2,3)===3?3:2;
+    const cube = k*k*k;
+    const mLo=Math.max(2,ceilDiv(lo,cube)), mHi=Math.max(mLo,Math.floor(hi/cube));
+    const m=rnd.pick(mLo,mHi);
+    const k1=m,k2=k*m,k3=k*k*m;
     r.provided=[k1,k2,k3];
-    r.rule='DOUBLE EACH KEY';
-    r.proof=['2 x '+k1+' = '+k2,'2 x '+k2+' = '+k3,'2 x '+k3+' = ?'];
-    return 8*m;
+    r.rule = k===2 ? 'DOUBLE EACH KEY' : 'MULTIPLY EACH KEY BY '+k;
+    r.proof=[k+' x '+k1+' = '+k2, k+' x '+k2+' = '+k3, k+' x '+k3+' = ?'];
+    return cube*m;
   }
   if(p==='halve'){
     const mLo=Math.max(3,lo), mHi=Math.min(1249,hi);
@@ -728,13 +737,19 @@ function buildRoom(r, rnd, level, lo, hi){
     return m;
   }
   if(p==='squares'){
-    const nLo=Math.max(2,isqrt(lo)-3), nHi=Math.min(96,isqrt(hi)-3);
-    const n=rnd.pick(nLo,Math.max(nLo,nHi));
-    const k1=n*n,k2=(n+1)*(n+1),k3=(n+2)*(n+2);
+    /* skip 1 = the next square each time; skip 2 = every other square. Both are
+       squares, both are stated by the hint, and together they double the pool */
+    const sk = rnd.pick(1,5);
+    const skip = sk<=2?1:(sk<=4?2:3);   /* 1 = next, 2 = every 2nd, 3 = every 3rd */
+    const rLo=Math.max(3,isqrt(lo)), rHi=Math.max(rLo,isqrt(hi));
+    const root=rnd.pick(rLo,rHi);           /* root of the answer */
+    let n=root-3*skip;                      /* root of the first key */
+    if(n<2) n=2;
+    const k1=n*n,k2=(n+skip)*(n+skip),k3=(n+2*skip)*(n+2*skip);
     r.provided=[k1,k2,k3];
-    r.rule='EACH KEY IS THE NEXT SQUARE';
-    r.proof=[n+'² = '+k1,(n+1)+'² = '+k2,(n+2)+'² = '+k3,(n+3)+'² = ?'];
-    return (n+3)*(n+3);
+    r.rule = skip===1 ? 'EACH KEY IS THE NEXT SQUARE' : 'EACH KEY IS EVERY '+skip+'nd SQUARE';
+    r.proof=[n+'² = '+k1,(n+skip)+'² = '+k2,(n+2*skip)+'² = '+k3,root+'² = ?'];
+    return root*root;
   }
   if(p==='fib'){
     const bLo=Math.max(3,ceilDiv(lo,3)+1), bHi=Math.max(bLo,Math.floor(hi/2)-1);
@@ -749,18 +764,20 @@ function buildRoom(r, rnd, level, lo, hi){
     return a+2*b;
   }
   if(p==='primes'){
-    const sLo=Math.max(11,lo-25), sHi=Math.max(sLo,hi-45);
-    var start=rnd.pick(sLo,sHi);
-    var p1=start; while(!isPrime(p1)) p1++;
-    var p2=nextPrime(p1);
-    var p3=nextPrime(p2);
-    var ans=nextPrime(p3);
-    if(ans>MAXV){ p1=101; p2=nextPrime(p1); p3=nextPrime(p2); ans=nextPrime(p3); }
+    const sLo=Math.max(11,lo-25), sHi=Math.max(sLo,Math.min(hi-80,9900));
+    let start=rnd.pick(sLo,sHi);
+    let p1=start; while(!isPrime(p1)) p1++;
+    let p2=nextPrime(p1), p3=nextPrime(p2), ans=nextPrime(p3);
+    while(ans>MAXV){                 /* never clamp: step the whole chain down */
+      p1-=2; while(!isPrime(p1)) p1--;
+      p2=nextPrime(p1); p3=nextPrime(p2); ans=nextPrime(p3);
+    }
     r.provided=[p1,p2,p3];
     r.rule='THE KEYS ARE CONSECUTIVE PRIMES';
     r.proof=[p1+' IS PRIME',p2+' IS PRIME',p3+' IS PRIME','NEXT PRIME AFTER '+p3+' = ?'];
     return ans;
   }
+
   /* compound: double each key, then subtract c */
   const c=rnd.pick(7,7+3*level);
   const kLo=Math.max(c+3,ceilDiv(lo+7*c,8)), kHi=Math.max(kLo,Math.floor((hi+7*c)/8));
@@ -772,8 +789,54 @@ function buildRoom(r, rnd, level, lo, hi){
   return 2*k3b-c;
 }
 
-function generateRoom(level, runSeed){
+/* ---------------------------------------------------------------- variety --
+   Rooms already dealt are remembered (and persisted), so a replay - even a
+   replay in a fresh browser session - does not hand you the same three keys
+   again while that chamber's pool still has rooms you have not seen. */
+const ROOM_MEMORY_MAX = 400;
+let roomMemory = [];
+let roomMemorySet = null;
+
+function memoryLoad(){
+  roomMemorySet = new Set();
+  try{
+    const raw = localStorage.getItem('kingsrule.rooms.v1');
+    if(raw){ const a=JSON.parse(raw); if(Array.isArray(a)) roomMemory=a.filter(x=>typeof x==='string'); }
+  }catch(e){ roomMemory=[]; }
+  for(const sig of roomMemory) roomMemorySet.add(sig);
+}
+function memorySave(){
+  try{ localStorage.setItem('kingsrule.rooms.v1', JSON.stringify(roomMemory)); }catch(e){}
+}
+function roomSignature(r){
+  return r.pattern+'|'+r.provided[0]+','+r.provided[1]+','+r.provided[2]+'|'+r.answer;
+}
+function roomRemember(sig){
+  if(roomMemorySet.has(sig)) return;
+  roomMemorySet.add(sig); roomMemory.push(sig);
+  while(roomMemory.length > ROOM_MEMORY_MAX){
+    roomMemorySet.delete(roomMemory.shift());
+  }
+  memorySave();
+}
+function memoryReset(){ roomMemory=[]; roomMemorySet=new Set(); memorySave(); }
+
+function generateRoom(level, runSeed, avoid){
   level=Math.min(9,Math.max(1,level|0));
+  if(avoid===false) return buildRoom(level, runSeed);
+  if(!roomMemorySet) memoryLoad();
+  let fallback=null;
+  for(let attempt=0; attempt<64; attempt++){
+    const r = buildRoom(level, (runSeed|0) + attempt*104729);
+    const sig = roomSignature(r);
+    if(!roomMemorySet.has(sig)){ roomRemember(sig); return r; }
+    if(!fallback) fallback=r;
+  }
+  roomRemember(roomSignature(fallback));
+  return fallback;
+}
+
+function buildRoom(level, runSeed){
   const idx=level-1;
   const isKing=(level===9);
   const r={ name:null, provided:[0,0,0], answer:-1, rule:'', proof:[], taunts:[], castOut:[],
@@ -803,11 +866,14 @@ function generateRoom(level, runSeed){
      while staying inside the 4-digit keypad. The pattern ladder (below) is the
      second, also rising, axis: +step, -step, x2, /2, squares, fibonacci,
      primes, two chained operations. */
+  /* exponential floor, 2.5x span: chamber n starts at 100*1.9^(n-1), so each
+     chamber is ~1.9x the previous one, and each band is wide enough to hold a
+     large pool of distinct rooms instead of a handful. */
   const base = 100*Math.pow(1.9, level-1);
   const lo = Math.floor(base);
-  const hi = Math.min(MAXV, Math.floor(base*1.55));
+  const hi = Math.min(MAXV, Math.floor(base*2.5));
   const rnd = makeRnd((runSeed|0) + level*7919);
-  r.answer = buildRoom(r, rnd, level, lo, hi);
+  r.answer = buildKeys(r, rnd, level, lo, hi);
   return r;
 }
 
@@ -828,9 +894,9 @@ function applyRule(r){
   const k=r.provided;
   if(r.pattern==='add') return k[2]+stepOf(r.rule);
   if(r.pattern==='sub') return k[2]-stepOf(r.rule);
-  if(r.pattern==='double') return 2*k[2];
+  if(r.pattern==='multiply'){ const kk=r.rule.indexOf('DOUBLE')>=0?2:stepOf(r.rule); return kk*k[2]; }
   if(r.pattern==='halve') return Math.floor(k[2]/2);
-  if(r.pattern==='squares') return Math.pow(isqrt(k[2])+1,2);
+  if(r.pattern==='squares'){ const st=r.rule.indexOf('NEXT SQUARE')>=0?1:tailNumber(r.rule); return Math.pow(isqrt(k[2])+st,2); }
   if(r.pattern==='fib') return k[1]+k[2];
   if(r.pattern==='primes') return nextPrime(k[2]);
   if(r.pattern==='compound') return 2*k[2]-tailNumber(r.rule);
@@ -958,7 +1024,7 @@ function resetGame(){
   document.getElementById('modal-intro-anim').classList.remove('visible');
   document.getElementById('modal-transition').classList.remove('visible');
   roomIdx=0; cleared=0; strikes=0; guess='';
-  runSeed=1+Math.floor(Math.random()*60000);   // fresh arithmetic each run
+  runSeed=1+Math.floor(Math.random()*2147483646);   // 2^31 starting points, fresh arithmetic each run
   showIntro();
 }
 
@@ -1144,6 +1210,11 @@ function submitGuess(){
   sfxStrike();
   flash=24; shake=12;
 }
+
+/* wipe the room memory: type this in the console, or just keep playing -
+   the memory only ever stops a room repeating, it never runs out of rooms */
+window.kingsRuleResetMemory = memoryReset;
+window.kingsRuleRoomPool = function(){ return roomMemory.length; };
 
 /* ======================================================================== LOOP ======================================================================== */
 function loop(){

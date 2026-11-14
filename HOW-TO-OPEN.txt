@@ -54,10 +54,14 @@ rooms could not be reasoned out at all. That is fixed:
       1 add      2 subtract   3 double    4 halve
       5 squares  6 fibonacci  7 primes    8 double-then-subtract
       9 THE KING - his own rule, every guess denied
-  * Difficulty rises exponentially: the answer band is multiplied by about 1.9
-    every chamber (100-155, 190-294, 368-552, 685-1063, 1296-1936, 2476-3837,
-    4721-7297, 8938-9999). Chamber 1 is a warm-up; chamber 8 is the full
+  * Difficulty rises exponentially: each chamber starts about 1.9x higher than
+    the last (100-250, 190-475, 368-896, 685-1249, 1296-3249, 2476-6190,
+    4721-9929, 8938-9999). Chamber 1 is a warm-up; chamber 8 is the full
     4-digit scale. Nothing is ever too easy and nothing is ever unfair.
+  * No repeated rooms. Every room you are dealt is remembered (the last 400),
+    and the game draws another if it has seen it before - chambers 3 and 5 are
+    the smallest pools at 87 and 66 rooms, everything else runs to hundreds or
+    thousands, so the same three keys practically never come back.
   * The rule is the warden's secret - nothing is printed on the wall. Press ?
     and the warden gives you a hint: the rule, plus the working applied to your
     own three keys (never the answer itself). It costs nothing, it never costs

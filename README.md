@@ -1,4 +1,4 @@
-# THE KING'S RULE — SWF Edition
+# THE KING'S RULE — v3.1.1 (Fair Cyphers, no repeats) — SWF Edition
 
 A single-file Flash (`.swf`) port of the HTML5 remake of *The King's Rule*
 (Sunburst Communications, 1983) — the Apple IIc terminal simulation where you
@@ -69,26 +69,32 @@ original design, preserved here.
 ## What's in the box
 
 - **9 chambers** — 8 wardens then The King.
-- **One rule per chamber, on a fixed ladder** — the pattern is *not* drawn at
+- **One rule family per chamber, on a fixed ladder** — the progression is not
   random, so the run always climbs the same way:
 
-  | Chamber | Warden | The rule (hidden until you press `?`) | Answer band |
-  |---|---|---|---|
-  | 1 | GATE GUARD | add a fixed step to each key | 100–155 |
-  | 2 | HALL WARDEN | subtract a fixed step | 190–294 |
-  | 3 | TOWER SENTRY | double each key | 368–552 |
-  | 4 | CHAMBER KEEP | halve each key | 685–1063 |
-  | 5 | VAULT WARDEN | each key is the next square | 1296–1936 |
-  | 6 | KEEP GUARDIAN | each key is the sum of the two before | 2476–3837 |
-  | 7 | SENTINEL PRIME | the keys are consecutive primes | 4721–7297 |
-  | 8 | DARK SENTINEL | double each key, then subtract a fixed number | 8938–9999 |
-  | 9 | THE KING | his own rule — every guess denied | — |
+  | Chamber | Warden | The rule (hidden until you press `?`) | Answer band | Distinct rooms |
+  |---|---|---|---|---|
+  | 1 | GATE GUARD | add a fixed step to each key | 100–250 | 1,963 |
+  | 2 | HALL WARDEN | subtract a fixed step | 190–475 | 4,569 |
+  | 3 | TOWER SENTRY | multiply each key by 2 (or 3) | 368–896 | 87 |
+  | 4 | CHAMBER KEEP | halve each key | 685–1249 | 565 |
+  | 5 | VAULT WARDEN | the next square / every 2nd / every 3rd square | 1296–3249 | 66 |
+  | 6 | KEEP GUARDIAN | each key is the sum of the two before | 2476–6190 | 29,576 |
+  | 7 | SENTINEL PRIME | the keys are consecutive primes | 4721–9929 | 589 |
+  | 8 | DARK SENTINEL | double each key, then subtract a fixed number | 8938–9999 | 3,319 |
+  | 9 | THE KING | his own rule — every guess denied | — | — |
 
-- **Exponential difficulty.** The answer band is multiplied by ~1.9 every
-  chamber (100 → 190 → 368 → 685 → 1296 → 2476 → 4721 → 8938), so each room is
-  roughly twice the arithmetic of the one before without ever leaving the
-  4-digit keypad. Chamber 1 is a two/three-digit warm-up; chamber 8 sits at the
-  top of the scale. The second axis — the rule itself — climbs with it.
+  About **30,000 distinct rooms** across the eight solvable chambers, counted by
+  exhaustively dealing each chamber 30,000 times.
+- **Exponential difficulty.** Chamber `n` starts at `100 × 1.9^(n−1)`, so each
+  chamber is roughly twice the arithmetic of the one before, and the last one
+  sits at the top of the 4-digit scale. The rule itself climbs with it.
+- **No repeats.** Every room dealt is remembered (the last 400, newest first);
+  a new room is drawn if it has been seen before, trying up to 64 candidates.
+  Chamber 3 has 87 rooms and chamber 5 has 66, so you can play those chambers
+  dozens of times before the same keys come back — and the HTML5 build keeps the
+  memory in `localStorage`, so it survives a reload (`window.kingsRuleResetMemory()`
+  wipes it if you ever want a clean slate).
 - **The rule is the warden's secret.** Nothing is printed on the wall. `?` asks
   the warden for a hint: it shows the rule *and* the working (the rule applied
   to your three keys, with the answer left for you). It is free, it never costs
@@ -129,6 +135,11 @@ the HTML5 engine) — zero failures, zero rooms where the stated rule disagrees
 with the accepted answer. A scripted playthrough then walks chambers 1 → 9,
 solves each one from its own hidden rule, and confirms the King denies
 everything: all checks pass.
+
+Variety audit: each chamber dealt 30,000 times gives ~30,000 distinct rooms in
+total (see the table above), and 300 consecutive deals of any chamber produce no
+repeats once the room memory is in play. Rooms are seeded by a 31-bit xorshift32
+stream, identical in both builds.
 
 ## Fidelity notes vs. the HTML original
 
