@@ -1,0 +1,159 @@
+# THE KING'S RULE - package / build metadata
+# Release info, artifacts and checksums, requirements, verification, changelog.
+# Companion to game.yaml (game content). Regenerate the manifest after any rebuild.
+schema: kings-rule/package/1
+package:
+  name: kings-rule
+  edition: harder-cyphers
+  version: 3.0.0
+  release_date: '2026-11-14'
+  license: freeware / fan remake - see attribution
+  language: en
+  archive:
+    file: kings_rule_swf.zip
+    files: 17
+    uncompressed_bytes: 2911679
+entrypoints:
+- file: game.html
+  label: HTML5 game (offline)
+  requires: any modern browser
+  notes: keep the assets/ folder next to it
+- file: kings_rule.html
+  label: SWF in a single page
+  requires: any modern browser + internet once (Ruffle from CDN)
+  notes: the whole 783 KB SWF is embedded as base64
+- file: kings_rule.swf
+  label: raw Flash movie
+  requires: Ruffle or Adobe Flash Player
+  notes: do not hand this to an audio player - Windows may map .swf to Winamp
+artifacts:
+  kings_rule.swf:
+    bytes: 782819
+    md5: c105ee1b24f0d0c9ad90b827b6e9260c
+    format: SWF v10 (CWS, zlib compressed), AVM2/AS3
+    stage: 1024x768
+    fps: 30
+    embedded:
+      sounds_mp3: 10
+      bitmaps_jpeg: 9
+      abc_blocks: 1
+    plays_in:
+    - Ruffle 0.7.1
+    - Adobe Flash Player projector
+  kings_rule.html:
+    bytes: 1047185
+    md5: 6d14e02c92a5095bfe3a7dc40b32d354
+    self_contained: true
+    external_dependency: https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle@0.7.1/ruffle.js
+  game.html:
+    bytes: 57940
+    md5: 5946bdb184bf3c8858a9006753da79f2
+    self_contained: false
+    companion_folder: assets/
+    runtime: vanilla JS + Canvas 2D + Web Audio, no libraries
+requirements:
+  browser: Chrome / Edge / Firefox / Safari, current versions
+  plugins: none
+  internet:
+    game.html: false
+    kings_rule.html: true
+    kings_rule.swf: false
+  install: none - unzip and double-click
+  min_viewport: 1024x768 (layout scales down)
+contents:
+- HOW-TO-OPEN.txt
+- README.md
+- meta.yaml
+- game.yaml
+- game.html
+- kings_rule.html
+- kings_rule.swf
+- assets/  (9 guard portraits + background, 48-colour PNG)
+build:
+  swf_toolchain: Haxe 4.3.6 (-swf, no Flex/Flash SDK)
+  swf_command: haxe -cp src -main Main -swf kings_rule.swf -D swf-header=1024:768:30:000000
+  html_wrapper_command: python3 tools/make_html.py kings_rule.html
+  asset_pipeline: python3 tools/make_assets.py (font, portraits, audio)
+  sources: kings_rule_swf/src/*.hx for the SWF; original HTML5 remake for game.html
+verification:
+  flow_tested_in:
+  - Ruffle 0.7.1 (headless Chromium)
+  - Chromium headless (HTML5 build)
+  flow_order:
+  - INTRO
+  - ENTER THE CASTLE
+  - CHAMBER 1-9
+  - ACCESS GRANTED
+  - CHAMBER CLEARED
+  - CAST OUT
+  - FAILURE ANIMATION
+  - GAME OVER
+  - CREDITS
+  overlapping_screens: false
+  page_errors: 0
+  screenshots: kings_rule_swf/screenshots/ (SWF) and kings_rule_swf/screenshots/html/ (HTML5)
+changelog:
+- version: 3.0.0
+  date: '2026-11-14'
+  changes:
+  - 'screen flow rebuilt to match the original: one opaque screen at a time, nothing stacked'
+  - added the missing reward screen after a correct answer (CYPHER SOLVED, ~1.2 s)
+  - re-packaged as game.html + assets/ next to the SWF and the single-page build
+  - added YAML metadata (meta.yaml, game.yaml)
+- version: 2.0.0
+  date: '2026-11-13'
+  changes:
+  - 'harder cyphers: values to 9999, four-digit answers, earlier hard patterns, growing + compound patterns'
+  - added kings_rule.html so the game opens by double-click in a browser
+- version: 1.0.0
+  date: '2026-11-12'
+  changes:
+  - first single-file SWF port of the HTML5 remake
+files:
+- path: HOW-TO-OPEN.txt
+  bytes: 3681
+  md5: b9ffbb6102e92450412c3ca4552212e5
+- path: README.md
+  bytes: 8423
+  md5: 983869056824d89f94cb36f8db8a0682
+- path: assets/background.png
+  bytes: 153691
+  md5: 7af0a20c3d324d58716634a53f046e21
+- path: assets/chamber_keep.png
+  bytes: 100794
+  md5: b8b9817d1e3c52f59e5613d4855f077f
+- path: assets/dark_sentinel.png
+  bytes: 90161
+  md5: 234831e0477798f4ac6206943363906f
+- path: assets/gate_guard.png
+  bytes: 115501
+  md5: 987508c4579e61f16f6f1868cfd19962
+- path: assets/hall_warden.png
+  bytes: 126623
+  md5: 5d2f973473ddd944e7e24fb8f1d4b416
+- path: assets/keep_guardian.png
+  bytes: 71687
+  md5: a35c7d98264cb2f72135e93ad9a1d440
+- path: assets/sentinel_prime.png
+  bytes: 89590
+  md5: 67fa877861959b20c9ac526eaa9ef51d
+- path: assets/the_king.png
+  bytes: 77313
+  md5: 297d5c6e97be349b7e61a1391a272314
+- path: assets/tower_sentry.png
+  bytes: 75648
+  md5: 6fafeef2f8846fc4f7e4e3be89e2092c
+- path: assets/vault_warden.png
+  bytes: 99045
+  md5: 2ffd6f6a5694703758d4cddea0fa0f41
+- path: game.html
+  bytes: 57940
+  md5: 5946bdb184bf3c8858a9006753da79f2
+- path: kings_rule.html
+  bytes: 1047185
+  md5: 6d14e02c92a5095bfe3a7dc40b32d354
+- path: kings_rule.swf
+  bytes: 782819
+  md5: c105ee1b24f0d0c9ad90b827b6e9260c
+files_note: MD5 manifest of every shipped file except the two YAML files themselves (self-referencing
+  checksums are impossible). Regenerate after any rebuild.
