@@ -45,24 +45,37 @@ Internet: kings_rule.html pulls Ruffle from a CDN on first load. If you have no
 connection, play game.html instead — it is fully local.
 
 
-3. THE HARDER CYPHERS (what changed in this build)
+3. HOW IT PLAYS NOW (what changed in this build)
 --------------------------------------------------
-The old build was solvable with small numbers. This one is not:
+The old build rolled a random rule per room and hid the rule entirely, so some
+rooms could not be reasoned out at all. That is fixed:
 
-  * Keys and answers now run up to four digits (9999 max) — type up to 4 digits.
-  * Difficulty curve is quadratic, so chamber 8 is far past chamber 2.
-  * Hard patterns arrive much earlier: squares in chamber 4, cubes and
-    fibonacci in 5, alternating in 6, growing steps in 7, primes and
-    "double then subtract" compounds in 8.
-  * The King's three keys are random 4-digit numbers and he denies every guess,
-    exactly as in the original.
+  * One rule per chamber, always in the same order:
+      1 add      2 subtract   3 double    4 halve
+      5 squares  6 fibonacci  7 primes    8 double-then-subtract
+      9 THE KING - his own rule, every guess denied
+  * Difficulty rises exponentially: the answer band is multiplied by about 1.9
+    every chamber (100-155, 190-294, 368-552, 685-1063, 1296-1936, 2476-3837,
+    4721-7297, 8938-9999). Chamber 1 is a warm-up; chamber 8 is the full
+    4-digit scale. Nothing is ever too easy and nothing is ever unfair.
+  * The rule is the warden's secret - nothing is printed on the wall. Press ?
+    and the warden gives you a hint: the rule, plus the working applied to your
+    own three keys (never the answer itself). It costs nothing, it never costs
+    a strike, and ? again hides it.
+  * A wrong guess costs a strike but THE KEYS DO NOT CHANGE. You get all three
+    tries on the same three numbers, so the arithmetic is always finishable.
+  * Every warden speaks: three taunts (one per strike) and its own two-line
+    cast-out speech. The King says "OFF WITH HIS HEAD."
 
-Example challenges you will actually meet:
-    1024  1089  1156  ->  1225          (squares)
-    2683  2687  2689  ->  2693          (primes)
-    977   1910  3776  ->  7508          (double, then subtract 44)
-    2514  3276  4089  ->  4953          (steps grow by 192)
-    keys 127  109  91 ->  73            (subtract 18)
+Example rooms, one per chamber, exactly as the engine deals them:
+           98   108   118  ->  128         (add 10)
+          322   302   282  ->  262         (subtract 20)
+           48    96   192  ->  384         (double)
+         5712  2856  1428  ->  714         (halve)
+         1681  1764  1849  ->  1936        (next square)
+          203  1790  1993  ->  3783        (sum of the two before)
+         6983  6991  6997  ->  7001        (consecutive primes)
+         1177  2332  4642  ->  9262        (double, then subtract 22)
 
 
 4. CONTROLS
@@ -70,7 +83,7 @@ Example challenges you will actually meet:
     0-9        type a digit (up to four)
     ENTER      submit a guess / advance a screen
     BACKSPACE  delete a digit
-    ?          hint — reveals the pattern rule
+    ?          hint — the warden tells you the rule + the working
 
 
 5. FILES
@@ -80,5 +93,9 @@ Example challenges you will actually meet:
     kings_rule.html      SWF port in a single page — double-click
     kings_rule.swf       the raw Flash file
     README.md            technical notes on how the SWF was built
+    game.yaml            machine-readable game info: rules, screen flow,
+                         chambers, cypher patterns, difficulty table
+    meta.yaml            machine-readable package info: version, artifacts,
+                         checksums, requirements, verification, changelog
 
 Nothing is installed, nothing is written to your disk.

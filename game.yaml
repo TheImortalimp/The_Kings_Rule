@@ -1,0 +1,341 @@
+# THE KING'S RULE - game content metadata
+# Machine-readable description of the game: rules, screen flow, chambers, the
+# cypher engine, difficulty curve. Companion to meta.yaml (packaging/build info).
+# Version 3.1.0 - FAIR CYPHERS.
+schema: kings-rule/game/1
+title: THE KING'S RULE
+subtitle: Apple IIc Terminal Simulation
+edition: Fair Cyphers
+version: 3.1.0
+year: 1983
+original_concept: Sunburst Communications
+genre:
+- puzzle
+- logic
+- number-sequence
+- retro-terminal
+player: River Lyle R.
+premise: Nine chambers stand between you and The King. Each warden hides a rule and hands you three
+  cypher keys. Work out the fourth key. Press ? and the warden will tell you the rule - it costs
+  nothing, but it is on his terms. Three wrong keys and you are cast out. The King denies every
+  guess; there is no victory screen, only how far you got.
+controls:
+- key: 0-9
+  action: type a digit of the 4th cypher key (up to four digits)
+- key: Enter
+  action: submit the guess, or advance a screen
+- key: Backspace
+  action: delete the last digit
+- key: '?'
+  action: ask the warden for a hint - the rule and the working; the King refuses
+rules:
+  keys_given_per_chamber: 3
+  answer: the 4th key, derived by applying the warden's rule to the third key
+  max_answer_digits: 4
+  max_value: 9999
+  strikes_per_warden: 3
+  rule_visibility: hidden - only the ? key reveals it
+  hint_cost: none (free and unlimited; pressing ? again hides it)
+  on_miss: a strike is recorded and the same three keys stay on the table
+  cypher_reroll: never mid-chamber - a new cypher only arrives with the next chamber
+  king: 'chamber 9 is unbeatable: every guess is denied'
+fairness:
+  rule_is_always_literal: applying the room's own rule to its own three keys always yields the accepted answer
+  keys: always three, distinct, and monotone in the direction of the answer
+  value_range: every key and answer is generated inside 1..9999 - nothing is clamped after the fact
+  validation: each generated room is re-derived before it is shown; a room whose rule disagrees with its answer is rejected
+  audit: 72000 rooms generated across both engines, 0 failures
+difficulty:
+  model: exponential - the answer band is multiplied by ~1.9 every chamber
+  pattern_axis: the rule itself also rises (+step, -step, x2, /2, squares, fibonacci, primes, two chained operations)
+  bands:
+  - chamber: 1
+    answer_min: 100
+    answer_max: 155
+  - chamber: 2
+    answer_min: 190
+    answer_max: 294
+  - chamber: 3
+    answer_min: 368
+    answer_max: 552
+  - chamber: 4
+    answer_min: 685
+    answer_max: 1063
+  - chamber: 5
+    answer_min: 1296
+    answer_max: 1936
+  - chamber: 6
+    answer_min: 2476
+    answer_max: 3837
+  - chamber: 7
+    answer_min: 4721
+    answer_max: 7297
+  - chamber: 8
+    answer_min: 8938
+    answer_max: 9999
+screen_flow:
+- step: 1
+  screen: INTRO
+  shows: title, sunburst line, four animated copper bars
+  advance: Enter
+- step: 2
+  screen: ENTER THE CASTLE
+  shows: the nine chambers, the controls, the ? hint, three strikes
+  advance: Enter
+- step: 3
+  screen: CHAMBER n / 9
+  shows: warden portrait, three cypher keys, input line, strike counter, ? hint line
+  advance: correct key
+- step: 4
+  screen: ACCESS GRANTED
+  shows: the solved 4th key in green, CYPHER SOLVED, the rule that was in play, cleared count
+  advance: automatic after 1200 ms
+- step: 5
+  screen: CHAMBER CLEARED
+  shows: room number and warden name
+  advance: Enter
+- step: 6
+  screen: CAST OUT
+  shows: '<warden name> BARS YOUR WAY, that warden''s two-line speech, STRIKE 3/3 - CAST OUT, chambers cleared'
+  advance: Enter
+- step: 7
+  screen: FAILURE ANIMATION
+  shows: kickout / dungeon / execute, or the King's beheading
+  advance: automatic after 2000 ms
+- step: 8
+  screen: GAME OVER
+  shows: chambers cleared out of 8, the King rejects your cypher
+  advance: Enter
+- step: 9
+  screen: CREDITS
+  shows: credits and developer name
+  advance: Enter -> back to INTRO
+screen_flow_notes: Steps 3-5 repeat for chambers 1 through 9 - all nine chambers are reached in one run.
+  Every screen is opaque and fully replaces the previous one; nothing is stacked or dimmed.
+chambers:
+- chamber: 1
+  warden: GATE GUARD
+  portrait: assets/gate_guard.png
+  pattern: add
+  rule_example: ADD 10 TO EACH KEY
+  answer_band: 100-155
+  animation: kickout
+  taunts:
+  - NOT EVEN THE GATE BELIEVES YOU.
+  - I HAVE SEEN FARMERS GUESS BETTER.
+  - ONE MORE AND THE PORTCULLIS STAYS SHUT.
+  cast_out:
+  - THE GATE DOES NOT OPEN TWICE.
+  - I SHUT IT MYSELF. GO HOME.
+- chamber: 2
+  warden: HALL WARDEN
+  portrait: assets/hall_warden.png
+  pattern: subtract
+  rule_example: SUBTRACT 20 FROM EACH KEY
+  answer_band: 190-294
+  animation: dungeon
+  taunts:
+  - THE HALL ECHOES THAT MISTAKE.
+  - EVERY WRONG STEP, I HEAR IT TWICE.
+  - THE CORRIDOR IS LONGER THAN YOUR PATIENCE.
+  cast_out:
+  - THE HALL SWALLOWS YOUR FOOTSTEPS.
+  - WALK BACK THE WAY YOU CAME. COUNT BACKWARDS.
+- chamber: 3
+  warden: TOWER SENTRY
+  portrait: assets/tower_sentry.png
+  pattern: double
+  rule_example: DOUBLE EACH KEY
+  answer_band: 368-552
+  animation: kickout
+  taunts:
+  - FROM UP HERE YOUR ARITHMETIC LOOKS SMALL.
+  - THE WIND CARRIED THAT GUESS AWAY.
+  - I SIGHTED YOU BEFORE YOU THOUGHT.
+  cast_out:
+  - THE TOWER WINDOW IS SHUT.
+  - I WATCHED YOU FAIL FROM THREE HUNDRED STEPS.
+- chamber: 4
+  warden: CHAMBER KEEP
+  portrait: assets/chamber_keep.png
+  pattern: halve
+  rule_example: HALVE EACH KEY
+  answer_band: 685-1063
+  animation: dungeon
+  taunts:
+  - HALF A GUESS IS NO GUESS.
+  - THE LOCK DID NOT EVEN TURN.
+  - I KEEP THE KEYS. YOU KEEP FAILING.
+  cast_out:
+  - THE DOOR IS BARRED AND THE KEY IS MINE.
+  - I KEEP WHAT YOU CANNOT OPEN.
+- chamber: 5
+  warden: VAULT WARDEN
+  portrait: assets/vault_warden.png
+  pattern: squares
+  rule_example: EACH KEY IS THE NEXT SQUARE
+  answer_band: 1296-1936
+  animation: kickout
+  taunts:
+  - GOLD IS COUNTED. GUESSES ARE NOT FORGIVEN.
+  - THE VAULT LAUGHS IN ROUND NUMBERS.
+  - I WEIGHED YOUR GUESS AGAINST GOLD. IT IS LIGHT.
+  cast_out:
+  - THE VAULT SHUTS. NOTHING IN HERE IS YOURS.
+  - COME BACK WITH ARITHMETIC OR WITH GOLD.
+- chamber: 6
+  warden: KEEP GUARDIAN
+  portrait: assets/keep_guardian.png
+  pattern: fib
+  rule_example: EACH KEY IS THE SUM OF THE TWO BEFORE
+  answer_band: 2476-3837
+  animation: dungeon
+  taunts:
+  - I HAVE STOOD HERE SIX HUNDRED YEARS.
+  - THE OLD STONES ADD UP BETTER THAN YOU.
+  - MY OATH IS PATIENT. YOUR LUCK IS NOT.
+  cast_out:
+  - THE OLD OATH BARS YOU.
+  - THE STONES REMEMBER. I WILL NOT FORGET.
+- chamber: 7
+  warden: SENTINEL PRIME
+  portrait: assets/sentinel_prime.png
+  pattern: primes
+  rule_example: THE KEYS ARE CONSECUTIVE PRIMES
+  answer_band: 4721-7297
+  animation: kickout
+  taunts:
+  - YOUR GUESS DIVIDES EVENLY INTO FAILURE.
+  - I AM INDIVISIBLE. YOU ARE NOT.
+  - PRIME. PRIME. PRIME. YOU ARE COMPOSITE.
+  cast_out:
+  - NO FACTOR OF MINE WILL LET YOU THROUGH.
+  - I DIVIDE THE WORTHY FROM THE REST. YOU ARE THE REST.
+- chamber: 8
+  warden: DARK SENTINEL
+  portrait: assets/dark_sentinel.png
+  pattern: compound
+  rule_example: DOUBLE EACH KEY, THEN SUBTRACT 22
+  answer_band: 8938-9999
+  animation: execute
+  taunts:
+  - THE DARK DOUBLES WHAT YOU OWE.
+  - I SUBTRACT NOTHING FROM YOUR SENTENCE.
+  - YOUR THIRD MISTAKE WAS COMING HERE AT ALL.
+  cast_out:
+  - THE DARK TAKES THE REST OF YOU.
+  - NOTHING LEAVES THIS CHAMBER. YOU INCLUDED.
+- chamber: 9
+  warden: THE KING
+  portrait: assets/the_king.png
+  pattern: king
+  rule_example: THE KING'S RULE IS HIS OWN
+  answer_band: none - every guess is denied
+  animation: kingExecute
+  taunts:
+  - 'NO.'
+  - STILL NO.
+  - THE KING HAS NEVER SAID YES.
+  cast_out:
+  - OFF WITH HIS HEAD.
+  - THE KING'S RULE IS THE ONLY RULE.
+cypher_patterns:
+- id: add
+  chamber: 1
+  rule: add a fixed step to each key
+  hint_text: ADD <step> TO EACH KEY
+  derivation: answer = key3 + step
+  example:
+    given: [98, 108, 118]
+    answer: 128
+    why: +10 each step
+- id: subtract
+  chamber: 2
+  rule: subtract a fixed step from each key
+  hint_text: SUBTRACT <step> FROM EACH KEY
+  derivation: answer = key3 - step
+  example:
+    given: [322, 302, 282]
+    answer: 262
+    why: -20 each step
+- id: double
+  chamber: 3
+  rule: each key is twice the one before
+  hint_text: DOUBLE EACH KEY
+  derivation: answer = 2 x key3
+  example:
+    given: [48, 96, 192]
+    answer: 384
+    why: x2 each step
+- id: halve
+  chamber: 4
+  rule: each key is half the one before
+  hint_text: HALVE EACH KEY
+  derivation: answer = key3 / 2
+  example:
+    given: [5712, 2856, 1428]
+    answer: 714
+    why: /2 each step
+- id: squares
+  chamber: 5
+  rule: the keys are consecutive squares
+  hint_text: EACH KEY IS THE NEXT SQUARE
+  derivation: answer = (sqrt(key3) + 1)^2
+  example:
+    given: [1681, 1764, 1849]
+    answer: 1936
+    why: 41^2, 42^2, 43^2, so 44^2
+- id: fib
+  chamber: 6
+  rule: each key is the sum of the two before it
+  hint_text: EACH KEY IS THE SUM OF THE TWO BEFORE
+  derivation: answer = key2 + key3
+  example:
+    given: [203, 1790, 1993]
+    answer: 3783
+    why: 1790 + 1993
+- id: primes
+  chamber: 7
+  rule: the keys are consecutive primes
+  hint_text: THE KEYS ARE CONSECUTIVE PRIMES
+  derivation: answer = the next prime after key3
+  example:
+    given: [6983, 6991, 6997]
+    answer: 7001
+    why: the next prime after 6997
+- id: compound
+  chamber: 8
+  rule: double each key, then subtract a fixed number
+  hint_text: DOUBLE EACH KEY, THEN SUBTRACT <c>
+  derivation: answer = 2 x key3 - c
+  example:
+    given: [1177, 2332, 4642]
+    answer: 9262
+    why: 2x1177-22, 2x2332-22, 2x4642-22
+- id: king
+  chamber: 9
+  rule: the King's own rule, never revealed
+  hint_text: none - the King refuses
+  derivation: none - every guess is denied
+  example:
+    given: three random four-digit keys
+    answer: unreachable
+    why: there is no victory screen
+hint_system:
+  key: '?'
+  reveals: the warden's rule plus the working applied to the three keys on screen
+  withholds: the answer itself - the last arithmetic step is always the player's
+  cost: none, and it never consumes a strike
+  toggle: pressing ? again hides the hint; typing a digit also hides it
+  king: refuses with WHY WOULD I HELP YOU?
+strike_system:
+  per_chamber: 3
+  on_wrong_key: one strike, the warden taunts, and the same three keys stay
+  on_third_strike: the warden delivers its cast-out speech, then a failure animation, GAME OVER, CREDITS
+  reset: strikes reset when a new chamber is entered
+scoring:
+  cleared: number of chambers solved (maximum 8 - the King cannot be beaten)
+  shown_on: ACCESS GRANTED, CAST OUT, GAME OVER
+audio:
+  music: medieval Dorian score (drone, lute arpeggio, lead, bell, drum)
+  sfx: correct, wrong, strike, transition, kickout, dungeon, execute, gameover

@@ -21,7 +21,7 @@
     background: #000; z-index: 1; pointer-events: none; display: block; }
   canvas#anim { position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     pointer-events: none; z-index: 50; display: none; }
-  canvas#game { image-rendering: pixelated; background: #000; border: 4px double #555;
+  canvas#game { image-rendering: auto; background: #000; border: 4px double #555;
     width: min(640px, 88vw, 74vh); height: auto; aspect-ratio: 4 / 3;
     box-shadow: 0 0 60px rgba(0,255,65,0.06); display: block; margin: 0 auto; z-index: 10; position: relative; }
   #scrollwrap { position: absolute; bottom: 0; left: 0; right: 0; height: clamp(28px,4vw,40px);
@@ -83,7 +83,7 @@
   </div>
   <div id="portrait-wrap"><div id="portrait-frame"><img id="portrait" src="" alt=""></div></div>
   <canvas id="game" width="640" height="480"></canvas>
-  <div id="scrollwrap"><div id="scroll">THE KING'S RULE  ·  SUNBURST COMMUNICATIONS 1983  ·  APPLE IIc TERMINAL SIMULATION  ·  DEVELOPER: RIVER LYLE R.  ·  NINE CHAMBERS  ·  EIGHT GUARDS  ·  THEN THE KING  ·  GATE GUARD  ·  HALL WARDEN  ·  TOWER SENTRY  ·  CHAMBER KEEP  ·  VAULT WARDEN  ·  KEEP GUARDIAN  ·  SENTINEL PRIME  ·  DARK SENTINEL  ·  THE KING  ·  CYPHER PATTERNS: ADD  ·  SUBTRACT  ·  MULTIPLY  ·  DIVIDE  ·  SQUARES  ·  CUBES  ·  FIBONACCI  ·  ALTERNATING  ·  PRIMES  ·  THREE KEYS GIVEN  ·  GUESS THE FOURTH  ·  THREE STRIKES AND YOU ARE CAST OUT  ·  THE KING DENIES EVERY GUESS  ·  NO VICTORY  ·  PRESS ENTER TO PLAY  ·  ? KEY FOR HINT  ·  0-9 DIGITS  ·  ENTER SUBMITS  ·  BACKSPACE DELETES  ·  COPPER BAR ANIMATION  ·  ASCII TERMINAL GRAPHICS  ·  MEDIEVAL CASTLE SOUNDTRACK  ·  FAILURE ANIMATIONS: KICKOUT  ·  DUNGEON  ·  EXECUTE  ·  KING EXECUTE  ·  GAME OVER  ·  CREDITS  ·  ENDLESS REPLAYS</div></div>
+  <div id="scrollwrap"><div id="scroll">THE KING'S RULE  ·  SUNBURST COMMUNICATIONS 1983  ·  APPLE IIc TERMINAL SIMULATION  ·  DEVELOPER: RIVER LYLE R.  ·  NINE CHAMBERS  ·  EIGHT WARDENS  ·  THEN THE KING  ·  GATE GUARD  ·  HALL WARDEN  ·  TOWER SENTRY  ·  CHAMBER KEEP  ·  VAULT WARDEN  ·  KEEP GUARDIAN  ·  SENTINEL PRIME  ·  DARK SENTINEL  ·  THE KING  ·  THE RULES: CHAMBER 1 ADD  ·  CHAMBER 2 SUBTRACT  ·  CHAMBER 3 DOUBLE  ·  CHAMBER 4 HALVE  ·  CHAMBER 5 SQUARES  ·  CHAMBER 6 FIBONACCI  ·  CHAMBER 7 PRIMES  ·  CHAMBER 8 DOUBLE THEN SUBTRACT  ·  THE WARDEN KEEPS THE RULE SECRET  ·  THREE KEYS GIVEN  ·  WORK OUT THE FOURTH  ·  THREE STRIKES AND YOU ARE CAST OUT  ·  THE SAME KEYS STAY FOR ALL THREE STRIKES  ·  ? ASKS FOR A HINT  ·  THE KING DENIES EVERY GUESS  ·  NO VICTORY  ·  PRESS ENTER TO PLAY  ·  0-9 DIGITS  ·  ENTER SUBMITS  ·  BACKSPACE DELETES  ·  COPPER BAR ANIMATION  ·  ASCII TERMINAL GRAPHICS  ·  MEDIEVAL CASTLE SOUNDTRACK  ·  FAILURE ANIMATIONS: KICKOUT  ·  DUNGEON  ·  EXECUTE  ·  KING EXECUTE  ·  GAME OVER  ·  CREDITS  ·  ENDLESS REPLAYS</div></div>
   <div id="dbg">PHASE: INTRO</div>
 
   <div id="modal-intro-anim" class="modal visible">
@@ -105,13 +105,15 @@
       <div class="modal-title cyn">ENTER THE CASTLE</div>
       <div class="modal-body">
         <div class="modal-line">Nine chambers stand between you and The King.</div>
-        <div class="modal-line">Each guard holds 3 cypher keys.</div>
-        <div class="modal-line">Guess the 4th key from the pattern.</div>
-        <div class="modal-line">Type digits 0-9, then Enter to submit.</div>
-        <div class="modal-line">Backspace deletes. ? shows a hint.</div>
-        <div class="modal-line ora">Hard cyphers: answers can reach 4 digits.</div>
-        <div class="modal-line red">3 strikes and you are cast out.</div>
-        <div class="modal-line red">The King denies every guess.</div>
+        <div class="modal-line">Each warden hides a rule and hands you 3 cypher keys.</div>
+        <div class="modal-line">Work out the 4th key. The rule is the warden's secret.</div>
+        <div class="modal-line yel">? makes the warden give you a hint. It costs nothing.</div>
+        <div class="modal-line">Type digits 0-9, then Enter. Backspace deletes.</div>
+        <div class="modal-line ora">A wrong key costs a strike. The keys themselves stand.</div>
+        <div class="modal-line red">3 strikes on the same keys and you are cast out.</div>
+        <div class="modal-line">Rules rise by chamber: ADD, SUBTRACT, DOUBLE, HALVE,</div>
+        <div class="modal-line">SQUARES, FIBONACCI, PRIMES, DOUBLE-THEN-SUBTRACT.</div>
+        <div class="modal-line red">The King in chamber 9 denies every guess.</div>
         <div class="modal-line yel" style="margin-top: 16px;">Press Enter to enter the castle</div>
       </div>
       <div class="ascii-border-bottom">╚═════════════════════════════════════════════════════════════════════════╝</div>
@@ -147,11 +149,12 @@
   <div id="modal-failure" class="modal">
     <div style="z-index: 210; text-align: center; font-family: 'Courier New', monospace;">
       <div class="ascii-border-top">╔═════════════════════════════════════════════════════════════════════════╗</div>
-      <div class="modal-title red pulse" id="fail-title">GUARD DEFEATED</div>
+      <div class="modal-title red pulse" id="fail-title">GATE GUARD BARS YOUR WAY</div>
       <div class="modal-body">
-        <div class="modal-line ora" id="fail-guard">THE GATE GUARD</div>
-        <div class="modal-line mag" id="fail-text" style="font-size: clamp(16px,3vw,22px); margin: 14px 0;">THE GATE SLAMS SHUT.</div>
+        <div class="modal-line mag" id="fail-line1" style="font-size: clamp(16px,3vw,22px); margin: 14px 0 4px;">THE GATE DOES NOT OPEN TWICE.</div>
+        <div class="modal-line mag" id="fail-line2" style="font-size: clamp(16px,3vw,22px); margin-bottom: 14px;">I SHUT IT MYSELF. GO HOME.</div>
         <div class="modal-line" id="fail-strike">STRIKE 3/3 — CAST OUT</div>
+        <div class="modal-line yel" id="fail-cleared">CHAMBERS CLEARED: 0 / 8</div>
         <div class="modal-line yel" style="margin-top: 22px;">Press Enter — the animation plays</div>
       </div>
       <div class="ascii-border-bottom">╚═════════════════════════════════════════════════════════════════════════╝</div>
@@ -623,208 +626,248 @@ function drawAnim(){
 }
 
 /* ======================================================================== CYPHER GENERATOR ======================================================================== */
-function randInt(min,max){ if(max<=min) return min; return Math.floor(Math.random()*(max-min+1))+min; }
-function isPrime(n){ if(n<2)return false; if(n%2===0) return n===2; for(let i=3;i*i<=n;i+=2) if(n%i===0) return false; return true; }
-function nextPrime(n){ let c=n+1; while(!isPrime(c)) c++; return c; }
-
-const GUARD_NAMES=['GATE GUARD','HALL WARDEN','TOWER SENTRY','CHAMBER KEEP','VAULT WARDEN','KEEP GUARDIAN','SENTINEL PRIME','DARK SENTINEL'];
-const GUARD_COLORS=['#4a90e2','#ff6600','#7f3fff','#ff00ff','#803000','#401080','#00ffff','#222222'];
-const GUARD_FACES=['#ff6600','#00ff41','#00ffff','#ff6600','#ffff44','#00ff41','#ff6600','#ff4444'];
-const FAIL_TEXTS=['THE GATE SLAMS SHUT.','WARDEN BARS YOUR PATH.','SENTRY SOUNDS ALARM.','KEEP GUARD THROWS YOU OUT.','VAULT LOCKS YOU INSIDE.','GUARDIAN DRAGS TO DUNGEON.','SENTINEL PRIME DELETES ACCESS.','DARK SENTINEL CONSUMES YOU.'];
-const FAIL_ANIM=['kickout','dungeon','kickout','dungeon','kickout','dungeon','kickout','execute'];
-
 /* ============================================================================
-   HARDER CYPHERS
-   Values up to 9999 (four-digit keys and answers), quadratic difficulty curve,
-   and the hard patterns unlock much earlier:
-     1 add, subtract      2 + multiply        3 + divide
-     4 + squares          5 + cubes, fibonacci
-     6 + alternating      7 + growing steps   8 + primes, compound
+   CYPHER ENGINE 3.1.0 - FAIR EDITION
+
+   1. The rule is always shown. The chamber wall states it and the three keys
+      prove it, so no answer can lose to "another rule that also fits".
+      ? shows the WORKING (the rule applied to the real keys), never the answer.
+   2. Every pattern is literal: applying the stated rule to key 3 gives the
+      answer. (The old DIVIDE room was built as [4b,3b,2b] but told you to
+      "divide by b", so it was unwinnable 100% of the time.)
+   3. One pattern per chamber, in a fixed ladder - no random pattern pool.
+   4. Nothing is clamped: every value is generated inside 1..9999 and then
+      re-validated by validateRoom().
+   5. Each warden taunts on strikes 1-3 and gives its own cast-out speech.
    ========================================================================= */
 const MAXV = 9999;
-function clampV(v){ return Math.min(Math.max(v,0),MAXV); }
+const MIN_A = 100;
+const GUARD_NAMES=['GATE GUARD','HALL WARDEN','TOWER SENTRY','CHAMBER KEEP','VAULT WARDEN','KEEP GUARDIAN','SENTINEL PRIME','DARK SENTINEL'];
+const GUARD_COLORS=['#4a90e2','#ff6600','#7f3fff','#ff00ff','#804020','#40a040','#00ffff','#9a9a9a'];
+const GUARD_FACES=['#ff6600','#00ff41','#00ffff','#ff6600','#ffff44','#00ff41','#ff6600','#ff4444'];
+const FAIL_ANIM=['kickout','dungeon','kickout','dungeon','kickout','dungeon','kickout','execute'];
+const LADDER=['add','sub','double','halve','squares','fib','primes','compound'];
 
-function generateRoom(level){
-  const isKing = level === 9;
-  const idx = level - 1;
-  const name = isKing ? 'THE KING' : GUARD_NAMES[idx];
-  const color = isKing ? '#ff4444' : GUARD_COLORS[idx];
-  const face = isKing ? '#000000' : GUARD_FACES[idx];
-  const failText = isKing ? 'OFF WITH HIS HEAD.' : FAIL_TEXTS[idx];
+const GUARD_TAUNTS=[
+  ['NOT EVEN THE GATE BELIEVES YOU.','I HAVE SEEN FARMERS GUESS BETTER.','ONE MORE AND THE PORTCULLIS STAYS SHUT.'],
+  ['THE HALL ECHOES THAT MISTAKE.','EVERY WRONG STEP, I HEAR IT TWICE.','THE CORRIDOR IS LONGER THAN YOUR PATIENCE.'],
+  ['FROM UP HERE YOUR ARITHMETIC LOOKS SMALL.','THE WIND CARRIED THAT GUESS AWAY.','I SIGHTED YOU BEFORE YOU THOUGHT.'],
+  ['HALF A GUESS IS NO GUESS.','THE LOCK DID NOT EVEN TURN.','I KEEP THE KEYS. YOU KEEP FAILING.'],
+  ['GOLD IS COUNTED. GUESSES ARE NOT FORGIVEN.','THE VAULT LAUGHS IN ROUND NUMBERS.','I WEIGHED YOUR GUESS AGAINST GOLD. IT IS LIGHT.'],
+  ['I HAVE STOOD HERE SIX HUNDRED YEARS.','THE OLD STONES ADD UP BETTER THAN YOU.','MY OATH IS PATIENT. YOUR LUCK IS NOT.'],
+  ['YOUR GUESS DIVIDES EVENLY INTO FAILURE.','I AM INDIVISIBLE. YOU ARE NOT.','PRIME. PRIME. PRIME. YOU ARE COMPOSITE.'],
+  ['THE DARK DOUBLES WHAT YOU OWE.','I SUBTRACT NOTHING FROM YOUR SENTENCE.','YOUR THIRD MISTAKE WAS COMING HERE AT ALL.']
+];
+const GUARD_CAST_OUT=[
+  ['THE GATE DOES NOT OPEN TWICE.','I SHUT IT MYSELF. GO HOME.'],
+  ['THE HALL SWALLOWS YOUR FOOTSTEPS.','WALK BACK THE WAY YOU CAME. COUNT BACKWARDS.'],
+  ['THE TOWER WINDOW IS SHUT.','I WATCHED YOU FAIL FROM THREE HUNDRED STEPS.'],
+  ['THE DOOR IS BARRED AND THE KEY IS MINE.','I KEEP WHAT YOU CANNOT OPEN.'],
+  ['THE VAULT SHUTS. NOTHING IN HERE IS YOURS.','COME BACK WITH ARITHMETIC OR WITH GOLD.'],
+  ['THE OLD OATH BARS YOU.','THE STONES REMEMBER. I WILL NOT FORGET.'],
+  ['NO FACTOR OF MINE WILL LET YOU THROUGH.','I DIVIDE THE WORTHY FROM THE REST. YOU ARE THE REST.'],
+  ['THE DARK TAKES THE REST OF YOU.','NOTHING LEAVES THIS CHAMBER. YOU INCLUDED.']
+];
+const KING_TAUNTS=['NO.','STILL NO.','THE KING HAS NEVER SAID YES.'];
+const KING_CAST_OUT=['OFF WITH HIS HEAD.',"THE KING'S RULE IS THE ONLY RULE."];
+
+function isPrime(n){ if(n<2)return false; if(n%2===0) return n===2; for(let i=3;i*i<=n;i+=2) if(n%i===0) return false; return true; }
+function nextPrime(n){ let c=n+1; while(!isPrime(c)) c++; return c; }
+function isqrt(n){ let r=Math.floor(Math.sqrt(n)); while(r*r>n) r--; while((r+1)*(r+1)<=n) r++; return r; }
+function ceilDiv(a,b){ return Math.ceil(a/b); }
+
+/* deterministic, identical to the SWF build (Lehmer / modulus 65537) */
+function makeRnd(seed){
+  let s=seed%65537; if(s<0) s+=65537; if(s===0) s=1;
+  for(let i=0;i<4;i++){ s=(s*75+74)%65537; }
+  return { pick:function(lo,hi){ s=(s*75+74)%65537; if(hi<=lo) return lo; return lo + (s%(hi-lo+1)); } };
+}
+
+function buildRoom(r, rnd, level, lo, hi){
+  const p=r.pattern;
+  if(p==='add'){
+    const stLo=Math.max(3,level*2+2);
+    const stHi=Math.min(6*level+10, Math.floor(Math.max(stLo,(hi-lo)/3+12)));
+    const st=rnd.pick(stLo,Math.max(stLo,stHi));
+    const aLo=Math.max(lo,3*st+20);
+    const a=rnd.pick(aLo,Math.max(aLo,hi));
+    const k1=a-3*st, k2=a-2*st, k3=a-st;
+    r.provided=[k1,k2,k3];
+    r.rule='ADD '+st+' TO EACH KEY';
+    r.proof=[k1+' + '+st+' = '+k2, k2+' + '+st+' = '+k3, k3+' + '+st+' = ?'];
+    return a;
+  }
+  if(p==='sub'){
+    const stLo=Math.max(2,level*2+1);
+    const stHi=Math.max(stLo,Math.min(5*level+10,Math.floor((MAXV-hi)/3)));
+    const st=rnd.pick(stLo,stHi);
+    const aHi=Math.min(hi,MAXV-3*st);
+    const a=rnd.pick(Math.min(lo,aHi),Math.max(Math.min(lo,aHi),aHi));
+    const k1=a+3*st, k2=a+2*st, k3=a+st;
+    r.provided=[k1,k2,k3];
+    r.rule='SUBTRACT '+st+' FROM EACH KEY';
+    r.proof=[k1+' - '+st+' = '+k2, k2+' - '+st+' = '+k3, k3+' - '+st+' = ?'];
+    return a;
+  }
+  if(p==='double'){
+    const mLo=Math.max(3,ceilDiv(lo,8)), mHi=Math.min(1249,Math.floor(hi/8));
+    const m=rnd.pick(mLo,Math.max(mLo,mHi));
+    const k1=m,k2=2*m,k3=4*m;
+    r.provided=[k1,k2,k3];
+    r.rule='DOUBLE EACH KEY';
+    r.proof=['2 x '+k1+' = '+k2,'2 x '+k2+' = '+k3,'2 x '+k3+' = ?'];
+    return 8*m;
+  }
+  if(p==='halve'){
+    const mLo=Math.max(3,lo), mHi=Math.min(1249,hi);
+    const m=rnd.pick(mLo,Math.max(mLo,mHi));
+    const k1=8*m,k2=4*m,k3=2*m;
+    r.provided=[k1,k2,k3];
+    r.rule='HALVE EACH KEY';
+    r.proof=[k1+' / 2 = '+k2,k2+' / 2 = '+k3,k3+' / 2 = ?'];
+    return m;
+  }
+  if(p==='squares'){
+    const nLo=Math.max(2,isqrt(lo)-3), nHi=Math.min(96,isqrt(hi)-3);
+    const n=rnd.pick(nLo,Math.max(nLo,nHi));
+    const k1=n*n,k2=(n+1)*(n+1),k3=(n+2)*(n+2);
+    r.provided=[k1,k2,k3];
+    r.rule='EACH KEY IS THE NEXT SQUARE';
+    r.proof=[n+'² = '+k1,(n+1)+'² = '+k2,(n+2)+'² = '+k3,(n+3)+'² = ?'];
+    return (n+3)*(n+3);
+  }
+  if(p==='fib'){
+    const bLo=Math.max(3,ceilDiv(lo,3)+1), bHi=Math.max(bLo,Math.floor(hi/2)-1);
+    const b=rnd.pick(bLo,bHi);
+    const aLo=Math.max(2,lo-2*b);
+    const aHi=Math.min(b-1,hi-2*b);
+    const a=rnd.pick(aLo,Math.max(aLo,aHi));
+    const k1=a,k2=b,k3=a+b;
+    r.provided=[k1,k2,k3];
+    r.rule='EACH KEY IS THE SUM OF THE TWO BEFORE';
+    r.proof=[k1+' + '+k2+' = '+k3, k2+' + '+k3+' = ?'];
+    return a+2*b;
+  }
+  if(p==='primes'){
+    const sLo=Math.max(11,lo-25), sHi=Math.max(sLo,hi-45);
+    var start=rnd.pick(sLo,sHi);
+    var p1=start; while(!isPrime(p1)) p1++;
+    var p2=nextPrime(p1);
+    var p3=nextPrime(p2);
+    var ans=nextPrime(p3);
+    if(ans>MAXV){ p1=101; p2=nextPrime(p1); p3=nextPrime(p2); ans=nextPrime(p3); }
+    r.provided=[p1,p2,p3];
+    r.rule='THE KEYS ARE CONSECUTIVE PRIMES';
+    r.proof=[p1+' IS PRIME',p2+' IS PRIME',p3+' IS PRIME','NEXT PRIME AFTER '+p3+' = ?'];
+    return ans;
+  }
+  /* compound: double each key, then subtract c */
+  const c=rnd.pick(7,7+3*level);
+  const kLo=Math.max(c+3,ceilDiv(lo+7*c,8)), kHi=Math.max(kLo,Math.floor((hi+7*c)/8));
+  const k1b=rnd.pick(kLo,kHi);
+  const k2b=2*k1b-c, k3b=2*k2b-c;
+  r.provided=[k1b,k2b,k3b];
+  r.rule='DOUBLE EACH KEY, THEN SUBTRACT '+c;
+  r.proof=['2 x '+k1b+' - '+c+' = '+k2b,'2 x '+k2b+' - '+c+' = '+k3b,'2 x '+k3b+' - '+c+' = ?'];
+  return 2*k3b-c;
+}
+
+function generateRoom(level, runSeed){
+  level=Math.min(9,Math.max(1,level|0));
+  const idx=level-1;
+  const isKing=(level===9);
+  const r={ name:null, provided:[0,0,0], answer:-1, rule:'', proof:[], taunts:[], castOut:[],
+            color:'#00ff41', face:'#00ff41', pattern:'', isKing:isKing };
+  const rndK = makeRnd((runSeed|0) + level*7919);
   if(isKing){
-    return { name, provided:[randInt(1000,MAXV),randInt(1000,MAXV),randInt(1000,MAXV)], answer:-1,
-      hint:'UNKNOWN CYPHER', proof:[], color, face, failText:'OFF WITH HIS HEAD.', pattern:'king', isKing:true };
+    r.name='THE KING'; r.color='#ff4444'; r.face='#000000';
+    /* he hands out keys like everyone else - they just never add up */
+    r.provided=[rndK.pick(1000,9999),rndK.pick(1000,9999),rndK.pick(1000,9999)];
+    r.answer=-1;                        // the King denies everything, by design
+    r.rule="THE KING'S RULE IS HIS OWN";
+    r.proof=[];
+    r.pattern='king';
+    r.taunts=KING_TAUNTS;
+    r.castOut=KING_CAST_OUT;
+    return r;
   }
+  r.name=GUARD_NAMES[idx];
+  r.color=GUARD_COLORS[idx];
+  r.face=GUARD_FACES[idx];
+  r.taunts=GUARD_TAUNTS[idx];
+  r.castOut=GUARD_CAST_OUT[idx];
+  r.pattern=LADDER[idx];
+  /* EXPONENTIAL DIFFICULTY: the answer band x1.9 every chamber
+     (100-155, 190-294, 368-552, 685-1063, 1296-1936, 2476-3837, 4721-7297,
+      8938-9999), so each room is about twice the arithmetic of the one before
+     while staying inside the 4-digit keypad. The pattern ladder (below) is the
+     second, also rising, axis: +step, -step, x2, /2, squares, fibonacci,
+     primes, two chained operations. */
+  const base = 100*Math.pow(1.9, level-1);
+  const lo = Math.floor(base);
+  const hi = Math.min(MAXV, Math.floor(base*1.55));
+  const rnd = makeRnd((runSeed|0) + level*7919);
+  r.answer = buildRoom(r, rnd, level, lo, hi);
+  return r;
+}
 
-  const exp = Math.pow(level, 2.0);
-  const baseMax = Math.min(MAXV, Math.max(90, Math.floor(exp * 45)));
-  const baseMin = Math.max(12, Math.floor(Math.pow(level, 1.8) * 6));
+function tauntOf(room, strike){
+  if(!room || !room.taunts || room.taunts.length===0) return 'DENIED.';
+  let i=strike-1; if(i<0) i=0; if(i>=room.taunts.length) i=room.taunts.length-1;
+  return room.taunts[i];
+}
 
-  let allowedPatterns = [0, 1];                                  // add, subtract
-  if(level >= 2) allowedPatterns.push(2);                        // multiply
-  if(level >= 3) allowedPatterns.push(3);                        // divide
-  if(level >= 4) allowedPatterns.push(4);                        // squares
-  if(level >= 5) allowedPatterns.push(5, 6);                     // cubes, fibonacci
-  if(level >= 6) allowedPatterns.push(7);                        // alternating
-  if(level >= 7) allowedPatterns.push(8);                        // growing steps
-  if(level >= 8) allowedPatterns.push(9, 10);                    // primes, compound
-
-  const p = allowedPatterns[randInt(0, allowedPatterns.length - 1)];
-  let provided = [], answer = 0, hint = '', proof = [], pattern = '';
-
-  if(p === 0){ // ADD
-    const stMax = Math.max(2, Math.min(Math.floor((MAXV - baseMin) / 6), Math.floor(baseMax / 2)));
-    const st = randInt(Math.max(2, level), stMax);
-    let sMax = Math.min(baseMax, MAXV - 4 * st);
-    let st2 = st;
-    if(sMax < baseMin){ st2 = 2; sMax = Math.min(baseMax, MAXV - 8); }
-    const s = randInt(baseMin, sMax);
-    provided = [s, s + st2, s + 2 * st2];
-    answer = s + 3 * st2;
-    hint = 'ADD ' + st2;
-    proof = [s+' +'+st2+' = '+(s+st2), (s+st2)+' +'+st2+' = '+(s+2*st2), (s+2*st2)+' +'+st2+' = '+answer];
-    pattern = 'add';
-  } else if(p === 1){ // SUBTRACT
-    const stMax = Math.max(2, Math.floor((baseMax - baseMin) / 5));
-    let st = randInt(Math.max(2, level * 2), stMax);
-    let lo = baseMin + 3 * st + 1;
-    const hi = Math.min(baseMax, MAXV);
-    if(hi < lo){ st = 2; lo = baseMin + 7; }
-    const s = randInt(lo, hi);
-    provided = [s, s - st, s - 2 * st];
-    answer = s - 3 * st;
-    hint = 'SUBTRACT ' + st;
-    proof = [s+' -'+st+' = '+(s-st), (s-st)+' -'+st+' = '+(s-2*st), (s-2*st)+' -'+st+' = '+answer];
-    pattern = 'subtract';
-  } else if(p === 2){ // MULTIPLY
-    const b = randInt(3, Math.min(2500, Math.max(6, Math.floor(baseMax / 3))));
-    provided = [b, b*2, b*3];
-    answer = b * 4;
-    hint = 'MULTIPLY BY ' + b;
-    proof = [b+' x1 = '+b, b+' x2 = '+(b*2), b+' x3 = '+(b*3), ' so x4 = '+answer];
-    pattern = 'multiply';
-  } else if(p === 3){ // DIVIDE
-    const b = randInt(3, Math.min(2500, Math.max(6, Math.floor(baseMax / 2))));
-    provided = [b*4, b*3, b*2];
-    answer = b;
-    hint = 'DIVIDE BY ' + b;
-    proof = [(b*4)+' /4 = '+b, (b*3)+' /3 = '+b, (b*2)+' /2 = '+b];
-    pattern = 'divide';
-  } else if(p === 4){ // SQUARES
-    const nMax = Math.min(96, 6 + level * 10);
-    let nMin = Math.max(3, level * 3);
-    if(nMin >= nMax) nMin = nMax - 4;
-    const n = randInt(nMin, nMax);
-    provided = [n*n, (n+1)*(n+1), (n+2)*(n+2)];
-    answer = (n+3)*(n+3);
-    hint = 'SQUARES';
-    proof = [n+'² = '+(n*n), (n+1)+'² = '+((n+1)*(n+1)), (n+2)+'² = '+((n+2)*(n+2)), ' so '+(n+3)+'² = '+answer];
-    pattern = 'squares';
-  } else if(p === 5){ // CUBES
-    const nMax = Math.min(18, 3 + level * 2);
-    let nMin = Math.max(3, level * 2);
-    if(nMin >= nMax) nMin = nMax - 2;
-    const n = randInt(nMin, nMax);
-    provided = [n*n*n, (n+1)*(n+1)*(n+1), (n+2)*(n+2)*(n+2)];
-    answer = (n+3)*(n+3)*(n+3);
-    hint = 'CUBES';
-    proof = [n+'³ = '+(n*n*n), (n+1)+'³ = '+((n+1)*(n+1)*(n+1)), (n+2)+'³ = '+((n+2)*(n+2)*(n+2)), ' so '+(n+3)+'³ = '+answer];
-    pattern = 'cubes';
-  } else if(p === 6){ // FIBONACCI
-    const a = randInt(baseMin, Math.min(baseMax, 6000));
-    let bMin = a + 1;
-    const bMax = Math.floor((MAXV - a) / 2);
-    if(bMax <= bMin) bMin = bMax - 2;
-    const b = randInt(bMin, bMax);
-    provided = [a, b, a+b];
-    answer = a + 2*b;
-    hint = 'FIBONACCI';
-    proof = [a+' + '+b+' = '+(a+b), b+' + '+(a+b)+' = '+answer];
-    pattern = 'fibonacci';
-  } else if(p === 7){ // ALTERNATING (+s then -m)
-    const n = randInt(baseMin, Math.min(baseMax, 4000));
-    const s = randInt(5, Math.max(6, Math.floor((MAXV - n) / 3)));
-    const m = randInt(2, Math.max(3, Math.floor(s / 2)));
-    provided = [n, n+s, n+s-m];
-    answer = n + 2*s - m;
-    if(answer < 1 || answer > MAXV){
-      const st = randInt(3, 40);
-      const s2 = randInt(baseMin, Math.min(baseMax, MAXV - 4*st));
-      provided = [s2, s2+st, s2+2*st];
-      answer = s2 + 3*st;
-      hint = 'ADD ' + st;
-      proof = [s2+' +'+st+' = '+(s2+st), (s2+st)+' +'+st+' = '+(s2+2*st), (s2+2*st)+' +'+st+' = '+answer];
-      pattern = 'add';
-    } else {
-      hint = 'ADD ' + s + ' THEN SUB ' + m;
-      proof = [n+' +'+s+' = '+(n+s), (n+s)+' -'+m+' = '+(n+s-m), (n+s-m)+' +'+s+' = '+answer];
-      pattern = 'alternating';
-    }
-  } else if(p === 8){ // GROWING STEPS (second difference)
-    const k1 = randInt(baseMin, Math.min(baseMax, 3000));
-    const a = randInt(3, Math.max(4, Math.floor(k1 * 0.35)));
-    const d = randInt(1, Math.max(2, Math.floor(a / 2)));
-    provided = [k1, k1 + a, k1 + 2*a + d];
-    answer = k1 + 3*a + 3*d;
-    if(answer > MAXV){
-      const st = randInt(3, 30);
-      const s2 = randInt(baseMin, Math.min(baseMax, MAXV - 4*st));
-      provided = [s2, s2+st, s2+2*st];
-      answer = s2 + 3*st;
-      hint = 'ADD ' + st;
-      proof = [s2+' +'+st+' = '+(s2+st), (s2+st)+' +'+st+' = '+(s2+2*st), (s2+2*st)+' +'+st+' = '+answer];
-      pattern = 'add';
-    } else {
-      hint = 'STEPS GROW BY ' + d;
-      proof = [k1+' +'+a+' = '+(k1+a), (k1+a)+' +'+(a+d)+' = '+(k1+2*a+d), (k1+2*a+d)+' +'+(a+2*d)+' = '+answer];
-      pattern = 'growing';
-    }
-  } else if(p === 9){ // PRIMES
-    let p1 = randInt(baseMin, Math.min(9700, baseMax + 60));
-    while(!isPrime(p1)) p1++;
-    let p2 = p1 + 1; while(!isPrime(p2)) p2++;
-    let p3 = p2 + 1; while(!isPrime(p3)) p3++;
-    let ans = nextPrime(p3);
-    if(ans > MAXV){
-      p1 = randInt(10, 200);
-      while(!isPrime(p1)) p1++;
-      p2 = p1 + 1; while(!isPrime(p2)) p2++;
-      p3 = p2 + 1; while(!isPrime(p3)) p3++;
-      ans = nextPrime(p3);
-    }
-    provided = [p1, p2, p3];
-    answer = ans;
-    hint = 'PRIMES';
-    proof = [p1+' is prime', p2+' is prime', p3+' is prime', ' next prime = '+answer];
-    pattern = 'primes';
-  } else { // COMPOUND: double, then subtract c
-    const c = randInt(3, Math.max(4, level * 6));
-    let k1Lo = Math.max(c + 3, baseMin);
-    const k1Hi = Math.min(baseMax, Math.floor((MAXV + 7 * c) / 8));
-    if(k1Hi <= k1Lo) k1Lo = Math.max(20, c + 3);
-    const k1 = randInt(k1Lo, k1Hi);
-    const k2 = 2*k1 - c;
-    const k3 = 2*k2 - c;
-    provided = [k1, k2, k3];
-    answer = 2*k3 - c;
-    hint = 'DOUBLE THEN SUBTRACT ' + c;
-    proof = [k1+' x2 -'+c+' = '+k2, k2+' x2 -'+c+' = '+k3, k3+' x2 -'+c+' = '+answer];
-    pattern = 'compound';
-  }
-
-  provided = provided.map(clampV);
-  answer = clampV(answer);
-
-  return { name, provided, answer, hint, proof, color, face, failText, pattern, isKing:false };
+function tailNumber(rule){
+  const m=rule.match(/\d+/g); return m?parseInt(m[m.length-1],10):0;
+}
+function stepOf(rule){
+  const m=rule.match(/\d+/g); return m?parseInt(m[0],10):0;
+}
+/* what a player does: apply the stated rule to the third key */
+function applyRule(r){
+  const k=r.provided;
+  if(r.pattern==='add') return k[2]+stepOf(r.rule);
+  if(r.pattern==='sub') return k[2]-stepOf(r.rule);
+  if(r.pattern==='double') return 2*k[2];
+  if(r.pattern==='halve') return Math.floor(k[2]/2);
+  if(r.pattern==='squares') return Math.pow(isqrt(k[2])+1,2);
+  if(r.pattern==='fib') return k[1]+k[2];
+  if(r.pattern==='primes') return nextPrime(k[2]);
+  if(r.pattern==='compound') return 2*k[2]-tailNumber(r.rule);
+  return -1;
+}
+/* independent re-check of a generated room; '' means the room is sound */
+function validateRoom(r){
+  if(r.isKing) return '';
+  const k=r.provided;
+  if(k.length!==3) return 'wrong key count';
+  for(const v of k) if(v<1||v>MAXV) return 'key out of range';
+  if(k[0]===k[1]||k[1]===k[2]) return 'duplicate keys';
+  const inc=(k[0]<k[1]&&k[1]<k[2]), dec=(k[0]>k[1]&&k[1]>k[2]);
+  if(!inc&&!dec) return 'keys not monotone';
+  if(r.answer<MIN_A||r.answer>MAXV) return 'answer out of range';
+  if(inc && r.answer<=k[2]) return 'answer does not continue upwards';
+  if(dec && r.answer>=k[2]) return 'answer does not continue downwards';
+  if(applyRule(r)!==r.answer) return 'rule gives '+applyRule(r)+' but room answers '+r.answer;
+  return '';
 }
 
 /* ======================================================================== GAME STATE ======================================================================== */
 let gamePhase='INTRO'; let roomIdx=0; let cleared=0; let strikes=0; let guess=''; let currentRoom=null;
 let shake=0, flash=0, flashCol=null;
-let hintVisible=false, hintTimer=0;
+let workingVisible=false, workingTimer=0;
+let roomMsgA='', roomMsgB='', roomMsgACol=null, roomMsgBCol=null;
+let runSeed=1;
 let revealedAnswer=null;
-const gameCanvas=document.getElementById('game'); const gameCtx=gameCanvas.getContext('2d');
-const CLR={ink:'#00ff41',red:'#ff4444',ora:'#ff6600',cyn:'#00ffff',mag:'#ff00ff',yel:'#ffff44',wht:'#ffffff'};
+const gameCanvas=document.getElementById('game');
+/* The terminal is 640x480 logical pixels. Draw it at 2x and let CSS scale it
+   down: at 1x, a CSS downscale with nearest-neighbour rendering silently
+   dropped glyph rows ("ENTER" rendered as "FNTER"), which made the terminal
+   unreadable at common window sizes. */
+gameCanvas.width=1280; gameCanvas.height=960;
+const gameCtx=gameCanvas.getContext('2d');
+gameCtx.setTransform(2,0,0,2,0,0);
+const CLR={ink:'#00ff41',red:'#ff4444',ora:'#ff6600',cyn:'#00ffff',mag:'#ff00ff',yel:'#ffff44',wht:'#ffffff',dim:'#00aa2c'};
 let scrollPos=0;
 const scrollEl=document.getElementById('scroll');
 function tickScroll(){
@@ -861,8 +904,10 @@ function showIntro(){
 function enterRoom(){
   try{
     stopAnim();
-    currentRoom=generateRoom(roomIdx+1); strikes=0; guess=''; gamePhase='ROOM'; setStatus('ROOM');
-    hintVisible=false; hintTimer=0; revealedAnswer=null;
+    currentRoom=generateRoom(roomIdx+1, runSeed); strikes=0; guess=''; gamePhase='ROOM'; setStatus('ROOM');
+    workingVisible=false; workingTimer=0; revealedAnswer=null;
+    roomMsgA=''; roomMsgB=''; roomMsgACol=null; roomMsgBCol=null;
+    if(validateRoom(currentRoom)!=='') console.warn('cypher rejected:', validateRoom(currentRoom));
     document.getElementById('strike').textContent='STRIKE 0/3'; document.getElementById('hint').textContent='?';
     const p=document.getElementById('portrait'); p.src='assets/'+currentRoom.name.toLowerCase().replace(' ','_')+'.png';
     p.classList.add('visible'); document.getElementById('portrait-frame').classList.add('visible'); p.onerror=function(){ this.style.opacity='0'; };
@@ -881,12 +926,14 @@ function showFailure(){
   gamePhase='FAILURE'; setStatus('FAILURE');
   document.getElementById('ui').classList.remove('visible');
   document.getElementById('portrait').classList.remove('visible');
-    document.getElementById('portrait-frame').classList.remove('visible');
+  document.getElementById('portrait-frame').classList.remove('visible');
   const rm=currentRoom;
-  document.getElementById('fail-title').textContent=rm?rm.name:'GUARD DEFEATED';
-  document.getElementById('fail-guard').textContent=rm?rm.name:'THE GUARD';
-  document.getElementById('fail-text').textContent=rm?rm.failText:'UNKNOWN FATE';
-  document.getElementById('fail-strike').textContent='STRIKE 3/3 — CAST OUT';
+  const words=(rm&&rm.castOut&&rm.castOut.length)?rm.castOut:['THE GUARD BARS YOUR WAY.'];
+  document.getElementById('fail-title').textContent=(rm?rm.name:'THE GUARD')+' BARS YOUR WAY';
+  document.getElementById('fail-line1').textContent=words[0]||'';
+  document.getElementById('fail-line2').textContent=words[1]||'';
+  document.getElementById('fail-strike').textContent='STRIKE '+strikes+'/3 — CAST OUT';
+  document.getElementById('fail-cleared').textContent='CHAMBERS CLEARED: '+cleared+' / 8';
   document.getElementById('modal-failure').classList.add('visible');
   sfxGameOver();
 }
@@ -911,6 +958,7 @@ function resetGame(){
   document.getElementById('modal-intro-anim').classList.remove('visible');
   document.getElementById('modal-transition').classList.remove('visible');
   roomIdx=0; cleared=0; strikes=0; guess='';
+  runSeed=1+Math.floor(Math.random()*60000);   // fresh arithmetic each run
   showIntro();
 }
 
@@ -960,31 +1008,40 @@ function drawScreen(){
       gameCtx.strokeStyle=CLR.mag; gameCtx.lineWidth=1;
       gameCtx.strokeRect(8,8,624,464);
       const rm=currentRoom;
-      puts(2,4,'  === CHAMBER '+(roomIdx+1)+' / 9 ===',CLR.cyn);
-      puts(2,6,'  GUARD: '+rm.name,rm.color);
-      puts(2,8,'  CYPHER KEYS:',CLR.wht);
-      puts(4,10,'    KEY 1: '+rm.provided[0]+'      KEY 2: '+rm.provided[1]+'      KEY 3: '+rm.provided[2],CLR.wht);
-      if(revealedAnswer){
-        puts(4,11,'    KEY 4: '+revealedAnswer+'  <-- SOLVED',CLR.ink);
+      puts(2,3,'  === CHAMBER '+(roomIdx+1)+' / 9 ===',CLR.cyn);
+      puts(2,5,'  WARDEN: '+rm.name,rm.color);
+      puts(2,7,'  THE WARDEN KEEPS THE RULE. THREE KEYS:',CLR.wht);
+      puts(2,9,'  KEY 1: '+rm.provided[0]+'     KEY 2: '+rm.provided[1]+'     KEY 3: '+rm.provided[2],CLR.wht);
+      if(revealedAnswer){ puts(2,11,'  KEY 4: '+revealedAnswer+'   <-- SOLVED',CLR.ink); }
+      else { puts(2,11,'  KEY 4: ?',CLR.wht); }
+      puts(2,13,'  ENTER THE 4th KEY:',CLR.yel);
+      puts(2,15,'  > '+guess+'_',CLR.yel);
+      if(workingVisible && workingTimer>0 && rm.proof && rm.proof.length){
+        /* the rule is the warden's secret: ? is the only way to get it, it is
+           free, and pressing ? again hides it - so no room is unwinnable */
+        puts(2,17,'  HINT: '+rm.rule,CLR.mag);
+        let row=18;
+        for(const ln of rm.proof){ if(row>21) break; puts(2,row,'  '+ln,CLR.cyn); row++; }
+        workingTimer--;
+      } else {
+        workingVisible=false;
+        if(roomMsgA) puts(2,18,roomMsgA,roomMsgACol||CLR.ink);
+        if(roomMsgB) puts(2,19,roomMsgB,roomMsgBCol||CLR.red);
+        if(!roomMsgA && !roomMsgB) puts(2,19,'  ? ASKS THE WARDEN FOR A HINT',CLR.dim);
       }
-      puts(2,14,'  ENTER 4th KEY:',CLR.yel);
-      puts(2,22,'  > '+guess+'_',CLR.yel);
-      if(hintVisible && hintTimer>0 && rm.hint){
-        puts(2,16,'  HINT: '+rm.hint,CLR.cyn);
-        hintTimer--;
-      } else { hintVisible=false; }
     } else if(gamePhase==='CLEAR' && currentRoom){
       /* REWARD SCREEN: shown for ~1.2s after a correct answer, before CHAMBER CLEARED */
       const rm=currentRoom;
       drawCleanFrame();
       puts(2,3,'=== CHAMBER '+(roomIdx+1)+' / 9 ===',CLR.cyn);
-      puts(2,5,'GUARD: '+rm.name,rm.color);
-      puts(2,7,'CYPHER KEYS:',CLR.wht);
+      puts(2,5,'WARDEN: '+rm.name,rm.color);
+      puts(2,6,'THE RULE: '+rm.rule,CLR.yel);
+      puts(2,8,'CYPHER KEYS:',CLR.wht);
       puts(2,9,'  KEY 1: '+rm.provided[0]+'     KEY 2: '+rm.provided[1]+'     KEY 3: '+rm.provided[2],CLR.wht);
       puts(2,11,'  KEY 4: '+rm.answer+'   <-- SOLVED',CLR.ink);
       puts(2,14,'*** ACCESS GRANTED ***',CLR.ink);
-      puts(2,16,'CYPHER SOLVED - THE GUARD STEPS ASIDE',CLR.cyn);
-      puts(2,18,'CLEARED: '+cleared+' / 9',CLR.yel);
+      puts(2,16,'CYPHER SOLVED - THE WARDEN STEPS ASIDE',CLR.cyn);
+      puts(2,18,'CLEARED: '+cleared+' / 8',CLR.yel);
       puts(2,20,'NEXT CHAMBER...',CLR.mag);
     } else if(gamePhase==='ROOM'){
       puts(2,12,'  PHASE: '+gamePhase,CLR.cyn);
@@ -1012,16 +1069,19 @@ function handleKey(key){
     return;
   }
   if(gamePhase==='ROOM'){
-    if(key>='0'&&key<='9'&&guess.length<4){ guess+=key; document.getElementById('hint').textContent=guess; }
-    else if(key==='Backspace'){ guess=guess.slice(0,-1); document.getElementById('hint').textContent=guess.length>0?guess:'?'; }
+    if(key>='0'&&key<='9'&&guess.length<4){ guess+=key; document.getElementById('hint').textContent=guess; workingVisible=false; roomMsgA=''; roomMsgB=''; }
+    else if(key==='Backspace'){ guess=guess.slice(0,-1); document.getElementById('hint').textContent=guess.length>0?guess:'?'; workingVisible=false; }
     else if(key==='Enter'){ if(guess.length>0) submitGuess(); }
     else if(key==='?'){
-      if(currentRoom&&currentRoom.hint){
-        hintVisible=true; hintTimer=180;
-        puts(16,14,'  HINT: '+currentRoom.hint,CLR.cyn);
+      if(workingVisible){ workingVisible=false; workingTimer=0; }
+      else if(currentRoom && currentRoom.proof && currentRoom.proof.length){
+        workingVisible=true; workingTimer=900;   /* stays until you type, or ? again */
+        roomMsgA=''; roomMsgB='';
         flashCol=CLR.cyn; flash=20; sfxCorrect();
       } else {
-        puts(16,14,'  WHY WOULD I HELP YOU?',CLR.red);
+        workingVisible=false;
+        roomMsgA='  '+(currentRoom&&currentRoom.isKing?'WHY WOULD I HELP YOU?':'NOTHING TO WORK OUT HERE.');
+        roomMsgACol=CLR.red;
         flashCol=CLR.red; flash=20; sfxWrong();
       }
     }
@@ -1050,35 +1110,39 @@ function submitGuess(){
   const correct=(rm&&rm.answer>=0&&g===rm.answer);
   if(correct){
     revealedAnswer=rm.answer;
-    puts(8,14,'  ACCESS GRANTED — CYPHER SOLVED',CLR.ink);
+    roomMsgA='  ACCESS GRANTED — CYPHER SOLVED'; roomMsgACol=CLR.ink;
+    roomMsgB=''; workingVisible=false;
     sfxCorrect();
     cleared++;
     strikes=0;
+    document.getElementById('strike').textContent='STRIKE 0/3';
     gamePhase='CLEAR';
     setStatus('CLEAR');
-    setTimeout(function(){
-      showTransition();
-    },1200);
-  } else {
-    strikes++;
-    puts(8,14,'  ACCESS DENIED',CLR.red);
-    puts(10,14,rm?rm.failText:'UNKNOWN',CLR.ora);
-    puts(12,14,'  STRIKE '+strikes+'/3',CLR.red);
-    sfxWrong();
-    flashCol=CLR.red; flash=35; shake=16;
-    document.getElementById('strike').textContent='STRIKE '+strikes+'/3';
-    document.getElementById('hint').textContent='?';
-    if(strikes>=3){
-      puts(14,14,'  FINAL STRIKE — GAME OVER',CLR.red);
-      showFailure();
-    } else {
-      puts(14,14,'  GUARD LAUGHS — NEW CYPHER',CLR.red);
-      flashCol=CLR.red; flash=24; shake=12; sfxStrike();
-      guess=''; document.getElementById('hint').textContent='?';
-      currentRoom = generateRoom(roomIdx+1);  // new randomized cipher
-      revealedAnswer = null;
-    }
+    setTimeout(function(){ showTransition(); },1200);
+    return;
   }
+
+  strikes++;
+  guess=''; document.getElementById('hint').textContent='?';
+  document.getElementById('strike').textContent='STRIKE '+strikes+'/3';
+  workingVisible=false;
+  revealedAnswer=null;
+  sfxWrong();
+  flashCol=CLR.red; flash=35; shake=16;
+
+  /* The warden answers, in its own words. The three keys do NOT change: the
+     same cypher stands for all three strikes so the arithmetic is finishable. */
+  roomMsgA='  '+tauntOf(rm,strikes);
+  roomMsgACol=CLR.ora;
+
+  if(strikes>=3){
+    roomMsgB='  FINAL STRIKE — CAST OUT'; roomMsgBCol=CLR.red;
+    showFailure();
+    return;
+  }
+  roomMsgB='  STRIKE '+strikes+'/3 — THE KEYS STAND'; roomMsgBCol=CLR.red;
+  sfxStrike();
+  flash=24; shake=12;
 }
 
 /* ======================================================================== LOOP ======================================================================== */

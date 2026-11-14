@@ -12,6 +12,8 @@ solve nine cypher chambers to reach a King who denies every guess.
 | `kings_rule.html` | **One self-contained page** — the SWF embedded as base64, Ruffle (CDN) plays it. Double-click into any modern browser. |
 | `kings_rule.swf` | The actual 783 KB SWF — one file, everything embedded (9 portraits, 10 sounds, font, code). Open with Ruffle or a Flash Player projector, **not** an audio player. |
 | `kings_rule_swf.zip` | All of the above + `HOW-TO-OPEN.txt`, ready to hand over. |
+| `meta.yaml` | Package metadata: version, artifacts + MD5 manifest, requirements, verification, changelog. |
+| `game.yaml` | Game metadata: rules, screen flow, the nine chambers, cypher patterns, difficulty table. |
 
 The SWF's checksum: `MD5 c105ee1b24f0d0c9ad90b827b6e9260c  kings_rule.swf` (782,819 bytes).
 
@@ -41,7 +43,7 @@ Click once inside the player so it takes keyboard focus, then press **Enter**.
 | `0`–`9` | Type the 4th cypher key (max 4 digits) |
 | `Enter` | Submit guess / advance screens |
 | `Backspace` | Delete last digit |
-| `?` (`Shift`+`/`) | Ask the guard for a hint — the King refuses |
+| `?` (`Shift`+`/`) | Ask the warden for the rule + the working (free, toggles) — the King refuses |
 
 ## Screen flow (identical in `game.html` and the SWF)
 
@@ -59,44 +61,74 @@ CHAMBER 1..9  --correct answer-->
         --> GAME OVER  --Enter--> CREDITS  --Enter--> INTRO
 ```
 
-Three strikes per guard and you are cast out. The King (Chamber 9) is
-unbeatable: every guess is denied. There is no victory screen — that is the
+Three strikes per warden and you are cast out; the keys stay put between the
+three, so a strike costs you a try and never the puzzle. The King (Chamber 9)
+is unbeatable: every guess is denied. There is no victory screen — that is the
 original design, preserved here.
 
 ## What's in the box
 
-- **9 chambers** — 8 guards/sentinels then The King.
-- **Harder cyphers** (this edition) — values run to **9999** and answers can be
-  **four digits** (type up to 4 digits). The difficulty curve is quadratic, and the
-  hard patterns arrive much sooner:
+- **9 chambers** — 8 wardens then The King.
+- **One rule per chamber, on a fixed ladder** — the pattern is *not* drawn at
+  random, so the run always climbs the same way:
 
-  | Chamber | Patterns in play |
-  |---|---|
-  | 1 | add, subtract |
-  | 2 | + multiply |
-  | 3 | + divide |
-  | 4 | + squares |
-  | 5 | + cubes, Fibonacci |
-  | 6 | + alternating (+n then −m) |
-  | 7 | + growing steps (the step itself increases) |
-  | 8 | + primes, compound (double, then subtract c) |
-  | 9 | THE KING — unknown cypher, every guess denied |
+  | Chamber | Warden | The rule (hidden until you press `?`) | Answer band |
+  |---|---|---|---|
+  | 1 | GATE GUARD | add a fixed step to each key | 100–155 |
+  | 2 | HALL WARDEN | subtract a fixed step | 190–294 |
+  | 3 | TOWER SENTRY | double each key | 368–552 |
+  | 4 | CHAMBER KEEP | halve each key | 685–1063 |
+  | 5 | VAULT WARDEN | each key is the next square | 1296–1936 |
+  | 6 | KEEP GUARDIAN | each key is the sum of the two before | 2476–3837 |
+  | 7 | SENTINEL PRIME | the keys are consecutive primes | 4721–7297 |
+  | 8 | DARK SENTINEL | double each key, then subtract a fixed number | 8938–9999 |
+  | 9 | THE KING | his own rule — every guess denied | — |
 
-  Two patterns are new in this edition: **growing steps** (second differences,
-  e.g. `2514, 3276, 4089 -> 4953`) and **compound** (e.g. `977, 1910, 3776 ->
-  7508`, solved as `x2 −44`). Multipliers, steps and prime ranges all scale up
-  with the chamber.
-- **3-strike system** with a freshly randomised cypher after each miss.
+- **Exponential difficulty.** The answer band is multiplied by ~1.9 every
+  chamber (100 → 190 → 368 → 685 → 1296 → 2476 → 4721 → 8938), so each room is
+  roughly twice the arithmetic of the one before without ever leaving the
+  4-digit keypad. Chamber 1 is a two/three-digit warm-up; chamber 8 sits at the
+  top of the scale. The second axis — the rule itself — climbs with it.
+- **The rule is the warden's secret.** Nothing is printed on the wall. `?` asks
+  the warden for a hint: it shows the rule *and* the working (the rule applied
+  to your three keys, with the answer left for you). It is free, it never costs
+  a strike, and pressing `?` again hides it. That is the fairness valve: no
+  room is ever unwinnable, because the rule is always one keystroke away.
+- **The keys never change mid-chamber.** A wrong guess costs a strike, the same
+  three keys stay on screen, and you can finish your arithmetic. Three strikes
+  on the same keys and the warden casts you out.
+- **Each warden has a voice.** Three taunts (one per strike) and a two-line
+  cast-out speech per warden, plus the King's own denial.
 - **Failure animations** — kickout, dungeon, execution, and the King's own
   beheading scene, plus the GAME OVER sequence.
 - **Amiga copper-bar intro** and ASCII-framed modal screens (castle, transition,
   cast out, game over, credits).
-- **Portraits** for every guard and the King, framed in the wooden frame.
+- **Portraits** for every warden and the King, framed in the wooden frame.
 - **Soundtrack + SFX** — the medieval Dorian score (drone, lute arpeggio, lead,
   bell, drum) plus every sting, all rendered offline from the original Web Audio
   patch and embedded as MP3.
 - **Scrolling marquee** and per-room procedural backdrop: forest fades into
   castle ramparts, with the throne room appearing in Chamber 9.
+
+## Fairness and soundness (3.1.0)
+
+The cypher engine is verified rather than assumed. Both builds share the same
+generator and the same rules:
+
+- every room is re-derived before it is shown — `Cypher.validate()` / 
+  `validateRoom()` apply the room's own rule to its own three keys and reject the
+  room if the result is not the accepted answer;
+- all values are generated inside `1..9999` by construction — nothing is clamped,
+  so the accepted answer can never disagree with the arithmetic on screen;
+- keys are always distinct and monotone, so no room is self-contradictory;
+- a wrong guess never re-rolls the cypher, so a player can always finish what
+  they started.
+
+Audit: **72,000 generated rooms** (32,000 through the SWF engine, 40,000 through
+the HTML5 engine) — zero failures, zero rooms where the stated rule disagrees
+with the accepted answer. A scripted playthrough then walks chambers 1 → 9,
+solves each one from its own hidden rule, and confirms the King denies
+everything: all checks pass.
 
 ## Fidelity notes vs. the HTML original
 

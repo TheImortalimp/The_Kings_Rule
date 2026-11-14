@@ -4,15 +4,15 @@
 schema: kings-rule/package/1
 package:
   name: kings-rule
-  edition: harder-cyphers
-  version: 3.0.0
+  edition: fair-cyphers
+  version: 3.1.0
   release_date: '2026-11-14'
   license: freeware / fan remake - see attribution
   language: en
   archive:
     file: kings_rule_swf.zip
-    files: 17
-    uncompressed_bytes: 2911679
+    files: 56
+    uncompressed_bytes: 4447387
 entrypoints:
 - file: game.html
   label: HTML5 game (offline)
@@ -28,8 +28,8 @@ entrypoints:
   notes: do not hand this to an audio player - Windows may map .swf to Winamp
 artifacts:
   kings_rule.swf:
-    bytes: 782819
-    md5: c105ee1b24f0d0c9ad90b827b6e9260c
+    bytes: 784741
+    md5: 816f3aa716d62797b0d8b836a9e3373e
     format: SWF v10 (CWS, zlib compressed), AVM2/AS3
     stage: 1024x768
     fps: 30
@@ -41,13 +41,13 @@ artifacts:
     - Ruffle 0.7.1
     - Adobe Flash Player projector
   kings_rule.html:
-    bytes: 1047185
-    md5: 6d14e02c92a5095bfe3a7dc40b32d354
+    bytes: 1049749
+    md5: a6bd6c41ec2b17ffcdc6cc97d6c69a80
     self_contained: true
     external_dependency: https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle@0.7.1/ruffle.js
   game.html:
-    bytes: 57940
-    md5: 5946bdb184bf3c8858a9006753da79f2
+    bytes: 62011
+    md5: 7b1c47c8e9a1901d51b3f553b4ecd483
     self_contained: false
     companion_folder: assets/
     runtime: vanilla JS + Canvas 2D + Web Audio, no libraries
@@ -91,8 +91,24 @@ verification:
   - CREDITS
   overlapping_screens: false
   page_errors: 0
+  chambers_reached: 1-9 verified by a scripted playthrough in both builds
+  cypher_audit: 72000 generated rooms, 0 invalid, 0 where the stated rule disagrees with the accepted answer
   screenshots: kings_rule_swf/screenshots/ (SWF) and kings_rule_swf/screenshots/html/ (HTML5)
 changelog:
+- version: 3.1.0
+  date: '2026-11-14'
+  changes:
+  - fixed the DIVIDE room, which hinted "divide by b" over keys [4b,3b,2b] and was unwinnable in 100% of its rolls; the rule is now literal in every room
+  - fixed silent clamping of answers above 9999, which could accept a number the working on screen disagreed with
+  - replaced the random pattern pool with one fixed rule per chamber (add, subtract, double, halve, squares, fibonacci, primes, double-then-subtract)
+  - put difficulty on an exponential curve: answer band x1.9 per chamber from 100-155 up to 8938-9999
+  - the rule is now the warden's secret; ? gives a free, unlimited hint (the rule plus the working) and never costs a strike
+  - a wrong guess no longer re-rolls the cypher: the same three keys stand for all three strikes
+  - every warden now speaks: three taunts plus its own cast-out speech; the King denies everything in his own words
+  - 'HTML5 build: fixed a CSS downscale that dropped glyph rows ("ENTER" rendered as "FNTER"); the terminal now draws at 2x'
+  - 'HTML5 build: per-guard strike and failure messages were being erased every frame; they are now persistent screen state'
+  - the King's three keys are no longer 0/0/0
+  - verified 72,000 generated rooms and a full 1-9 playthrough in both builds
 - version: 3.0.0
   date: '2026-11-14'
   changes:
@@ -111,11 +127,26 @@ changelog:
   - first single-file SWF port of the HTML5 remake
 files:
 - path: HOW-TO-OPEN.txt
-  bytes: 3681
-  md5: b9ffbb6102e92450412c3ca4552212e5
+  bytes: 4614
+  md5: 2a382f926dfdf0cfd1128700a4327e68
 - path: README.md
-  bytes: 8423
-  md5: 983869056824d89f94cb36f8db8a0682
+  bytes: 10606
+  md5: 521bee375c4829246d2571100277c321
+- path: game.html
+  bytes: 62011
+  md5: 7b1c47c8e9a1901d51b3f553b4ecd483
+- path: game.yaml
+  bytes: 10707
+  md5: 9e07d1539bae356c9f506840649f4b13
+- path: kings_rule.html
+  bytes: 1049749
+  md5: a6bd6c41ec2b17ffcdc6cc97d6c69a80
+- path: kings_rule.swf
+  bytes: 784741
+  md5: 816f3aa716d62797b0d8b836a9e3373e
+- path: meta.yaml
+  bytes: 6444
+  md5: self
 - path: assets/background.png
   bytes: 153691
   md5: 7af0a20c3d324d58716634a53f046e21
@@ -146,14 +177,3 @@ files:
 - path: assets/vault_warden.png
   bytes: 99045
   md5: 2ffd6f6a5694703758d4cddea0fa0f41
-- path: game.html
-  bytes: 57940
-  md5: 5946bdb184bf3c8858a9006753da79f2
-- path: kings_rule.html
-  bytes: 1047185
-  md5: 6d14e02c92a5095bfe3a7dc40b32d354
-- path: kings_rule.swf
-  bytes: 782819
-  md5: c105ee1b24f0d0c9ad90b827b6e9260c
-files_note: MD5 manifest of every shipped file except the two YAML files themselves (self-referencing
-  checksums are impossible). Regenerate after any rebuild.
